@@ -40,7 +40,6 @@ public class ComponentManagerFactory {
      *
      * @return a ComponentManager instance.
      */
-    @SuppressWarnings("unchecked")
     public static synchronized ComponentManager getComponentManager() {
         if (componentManager != null) {
             return componentManager;
@@ -50,7 +49,7 @@ public class ComponentManagerFactory {
         String className = System.getProperty("whack.componentManagerClass");
         if (className != null) {
             try {
-                Class c = Class.forName(className);
+                Class<?> c = Class.forName(className);
                 componentManager = (ComponentManager)c.newInstance();
                 return componentManager;
             }

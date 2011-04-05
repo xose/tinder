@@ -150,20 +150,18 @@ public abstract class Packet {
         if (to == null || to.length() == 0) {
             return null;
         }
-        else {
-            if (toJID != null && to.equals(toJID.toString())) {
-                return toJID;
-            }
-            else {
-                // Return a new JID that bypasses stringprep profile checking.
-                // This improves speed and is safe as long as the user doesn't
-                // directly manipulate the attributes of the underlying Element
-                // that represent JID's.
-                String[] parts = JID.getParts(to);
-                toJID = new JID(parts[0], parts[1], parts[2], true);
-                return toJID;
-            }
+        
+        if (toJID != null && to.equals(toJID.toString())) {
+            return toJID;
         }
+        
+        // Return a new JID that bypasses stringprep profile checking.
+        // This improves speed and is safe as long as the user doesn't
+        // directly manipulate the attributes of the underlying Element
+        // that represent JID's.
+        String[] parts = JID.getParts(to);
+        toJID = new JID(parts[0], parts[1], parts[2], true);
+        return toJID;
     }
 
     /**
@@ -212,20 +210,18 @@ public abstract class Packet {
         if (from == null || from.length() == 0) {
             return null;
         }
-        else {
-            if (fromJID != null && from.equals(fromJID.toString())) {
-                return fromJID;
-            }
-            else {
-                // Return a new JID that bypasses stringprep profile checking.
-                // This improves speed and is safe as long as the user doesn't
-                // directly manipulate the attributes of the underlying Element
-                // that represent JID's.
-                String[] parts = JID.getParts(from);
-                fromJID = new JID(parts[0], parts[1], parts[2], true);
-                return fromJID;
-            }
+        
+        if (fromJID != null && from.equals(fromJID.toString())) {
+            return fromJID;
         }
+        
+        // Return a new JID that bypasses stringprep profile checking.
+        // This improves speed and is safe as long as the user doesn't
+        // directly manipulate the attributes of the underlying Element
+        // that represent JID's.
+        String[] parts = JID.getParts(from);
+        fromJID = new JID(parts[0], parts[1], parts[2], true);
+        return fromJID;
     }
 
     /**

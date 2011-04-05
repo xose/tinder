@@ -116,9 +116,7 @@ public class PacketError {
         if (type != null) {
             return Type.fromXMPP(type);
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**

@@ -97,9 +97,7 @@ public class Message extends Packet {
         if (type != null) {
             return Type.valueOf(type);
         }
-        else {
-            return Type.normal;
-        }
+        return Type.normal;
     }
 
     /**

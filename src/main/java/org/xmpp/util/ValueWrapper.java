@@ -58,7 +58,7 @@ public class ValueWrapper<V> implements Serializable {
 		 * {@link ValueWrapper} instance.
 		 */
 		USE_VALUE
-	};
+	}
 
 	/**
 	 * The value that is wrapped.

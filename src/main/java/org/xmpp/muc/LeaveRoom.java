@@ -18,6 +18,7 @@ package org.xmpp.muc;
 
 import net.jcip.annotations.NotThreadSafe;
 
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
 
 /**
@@ -43,7 +44,7 @@ public class LeaveRoom extends Presence {
      * @param from the full JID of the user that wants to leave the room.
      * @param to the room JID. That is the room address plus the nickname of the user as a resource.
      */
-    public LeaveRoom(String from, String to) {
+    public LeaveRoom(JID from, JID to) {
         super();
         setFrom(from);
         setTo(to);

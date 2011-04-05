@@ -18,6 +18,7 @@ package org.xmpp.muc;
 
 import net.jcip.annotations.NotThreadSafe;
 
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;
 
 /**
@@ -45,7 +46,7 @@ public class JoinRoom extends Presence {
      * @param to a full JID where the bare JID is the MUC room address and the resource is the
      *        nickname of the user joining the room.
      */
-    public JoinRoom(String from, String to) {
+    public JoinRoom(JID from, JID to) {
         super();
         setFrom(from);
         setTo(to);

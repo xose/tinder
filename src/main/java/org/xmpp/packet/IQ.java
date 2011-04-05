@@ -131,9 +131,7 @@ public class IQ extends Packet {
         if (type != null) {
             return Type.valueOf(type);
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -185,19 +183,18 @@ public class IQ extends Packet {
         if (elements.isEmpty()) {
             return null;
         }
-        else {
-            // Search for a child element that is in a different namespace.
-            for (int i=0; i<elements.size(); i++) {
-                Element element = elements.get(i);
-                String namespace = element.getNamespaceURI();
-                if (!namespace.equals("") && !namespace.equals("jabber:client") &&
-                        !namespace.equals("jabber:server"))
-                {
-                    return element;
-                }
+        
+        // Search for a child element that is in a different namespace.
+        for (int i=0; i<elements.size(); i++) {
+            Element element = elements.get(i);
+            String namespace = element.getNamespaceURI();
+            if (!namespace.equals("") && !namespace.equals("jabber:client") &&
+                    !namespace.equals("jabber:server"))
+            {
+                return element;
             }
-            return null;
         }
+        return null;
     }
 
     /**

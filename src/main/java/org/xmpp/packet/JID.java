@@ -615,11 +615,8 @@ public class JID implements Comparable<JID>, Serializable {
 
         // Resource
         String resource = null;
-        if (slashIndex + 1 > jid.length() || slashIndex < 0) {
-            resource = null;
-        }
-        else {
-            resource = jid.substring(slashIndex + 1);
+        if (slashIndex >= 0 && slashIndex < jid.length()) {
+        	resource = jid.substring(slashIndex + 1);
         }
         
         final String[] parts = new String[3];

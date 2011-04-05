@@ -19,6 +19,7 @@ package org.xmpp.muc;
 import net.jcip.annotations.NotThreadSafe;
 
 import org.dom4j.Element;
+import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
 /**
@@ -49,11 +50,11 @@ public class Invitation extends Message {
      *        address.
      * @param reason the reason why the invitation is being sent.
      */
-    public Invitation(String invitee, String reason) {
+    public Invitation(JID invitee, String reason) {
         super();
         Element element = addChildElement("x", "http://jabber.org/protocol/muc#user");
         Element invite = element.addElement("invite");
-        invite.addAttribute("to", invitee);
+        invite.addAttribute("to", invitee.toString());
         if (reason != null && reason.length() > 0) {
             invite.addElement("reason").setText(reason);
         }

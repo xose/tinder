@@ -138,9 +138,7 @@ public class DataForm extends PacketExtension {
         if (type != null) {
             return DataForm.Type.valueOf(type);
         }
-        else {
-            return null;
-        }
+        return null;
     }
 
     /**
@@ -332,7 +330,6 @@ public class DataForm extends PacketExtension {
      *
      * @param fields list of <variable,value> to be added as a new item.
      */
-    @SuppressWarnings("unchecked")
     public void addItemFields(Map<String,Object> fields) {
         Element item = element.addElement("item");
         // Add a field element to the item element for each row in fields
@@ -345,7 +342,7 @@ public class DataForm extends PacketExtension {
         	}
             if (value instanceof Collection) {
                 // Add a value element for each entry in the collection
-            	for (Object colValue : (Collection) value) {
+            	for (Object colValue : (Collection<?>) value) {
             		if (colValue != null) {
             			field.addElement("value").setText(encode(colValue));
             		}

@@ -111,12 +111,10 @@ public class Presence extends Packet {
      */
     public Type getType() {
         String type = element.attributeValue("type");
-        if (type == null) {
-            return null;
-        }
-        else {
+        if (type != null) {
             return Type.valueOf(type);
         }
+        return null;
     }
 
     /**
@@ -141,12 +139,10 @@ public class Presence extends Packet {
      */
     public Show getShow() {
         String show = element.elementText("show");
-        if (show == null) {
-            return null;
-        }
-        else {
+        if (show != null) {
             return Show.valueOf(show);
         }
+        return null;
     }
 
     /**
@@ -221,13 +217,12 @@ public class Presence extends Packet {
         if (priority == null) {
             return 0;
         }
-        else {
-            try {
-                return Integer.parseInt(priority);
-            }
-            catch (Exception e) {
-                return 0;
-            }
+        
+        try {
+            return Integer.parseInt(priority);
+        }
+        catch (Exception e) {
+            return 0;
         }
     }
 
