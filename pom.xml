@@ -80,22 +80,9 @@
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.5</maven.compiler.source>
-		<maven.compiler.target>1.5</maven.compiler.target>
+		<maven.compiler.source>1.6</maven.compiler.source>
+		<maven.compiler.target>1.6</maven.compiler.target>
 	</properties>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<configuration>
-					<descriptorRefs>
-						<descriptorRef>bin</descriptorRef>
-						<descriptorRef>src</descriptorRef>
-					</descriptorRefs>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>
@@ -109,14 +96,9 @@
 			<version>1.6.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.gnu.inet</groupId>
-			<artifactId>libidn</artifactId>
-			<version>1.15</version>
-		</dependency>
-		<dependency>
 			<groupId>com.googlecode.concurrentlinkedhashmap</groupId>
 			<artifactId>concurrentlinkedhashmap-lru</artifactId>
-			<version>1.0_jdk5</version>
+			<version>1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>net.jcip</groupId>

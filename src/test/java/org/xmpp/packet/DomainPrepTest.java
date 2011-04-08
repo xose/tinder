@@ -55,7 +55,7 @@ public class DomainPrepTest {
 		final String result = JID.domainprep(domain);
 
 		// verify
-		assertEquals(domain.toLowerCase(), result);
+		assertEquals(domain, result);
 	}
 
 	/**

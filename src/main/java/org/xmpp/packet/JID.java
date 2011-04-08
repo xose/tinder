@@ -16,18 +16,17 @@
 
 package org.xmpp.packet;
 
-import gnu.inet.encoding.IDNA;
-import gnu.inet.encoding.Stringprep;
-import gnu.inet.encoding.StringprepException;
-
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.IDN;
 import java.util.concurrent.ConcurrentMap;
 
 import net.jcip.annotations.Immutable;
 
 import org.xmpp.util.ValueWrapper;
 import org.xmpp.util.ValueWrapper.Representation;
+import org.xmpp.util.stringprep.NodePrep;
+import org.xmpp.util.stringprep.ResourcePrep;
 
 import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap.Builder;
 
@@ -253,7 +252,7 @@ public class JID implements Comparable<JID>, Serializable {
 		final String answer;
 		if (cachedResult == null) {
 			try {
-				answer = Stringprep.nodeprep(node);
+				answer = NodePrep.prepare(node);
 				// Validate field is not greater than 1023 bytes. UTF-8
 				// characters use one to four bytes.
 				if (answer != null && answer.getBytes("UTF-8").length > 1023) {
@@ -320,7 +319,7 @@ public class JID implements Comparable<JID>, Serializable {
 	 * @throws IllegalArgumentException
 	 *             if <tt>domain</tt> is not a valid JID domain part.
 	 */
-	public static String domainprep(String domain) throws StringprepException {
+	public static String domainprep(String domain) {
 		if (domain == null) {
 			throw new IllegalArgumentException(
 					"Argument 'domain' cannot be null.");
@@ -331,7 +330,7 @@ public class JID implements Comparable<JID>, Serializable {
 		final String answer;
 		if (cachedResult == null) {
 			try {
-				answer = Stringprep.nameprep(IDNA.toASCII(domain), false);
+				answer = IDN.toASCII(domain, IDN.USE_STD3_ASCII_RULES);
 				// Validate field is not greater than 1023 bytes. UTF-8
 				// characters use one to four bytes.
 				if (answer != null && answer.getBytes("UTF-8").length > 1023) {
@@ -399,8 +398,7 @@ public class JID implements Comparable<JID>, Serializable {
 	 * @throws IllegalArgumentException
 	 *             if <tt>resource</tt> is not a valid JID resource.
 	 */
-	public static String resourceprep(String resource)
-			throws StringprepException {
+	public static String resourceprep(String resource) {
 		if (resource == null) {
 			return null;
 		}
@@ -411,7 +409,7 @@ public class JID implements Comparable<JID>, Serializable {
 		final String answer;
 		if (cachedResult == null) {
 			try {
-				answer = Stringprep.resourceprep(resource);
+				answer = ResourcePrep.prepare(resource);
 				// Validate field is not greater than 1023 bytes. UTF-8
 				// characters use one to four bytes.
 				if (answer != null && answer.getBytes("UTF-8").length > 1023) {
