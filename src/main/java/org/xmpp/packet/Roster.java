@@ -251,7 +251,8 @@ public class Roster extends IQ {
      *
      * @return a deep copy of this Roster.
      */
-    public Roster createCopy() {
+    @Override
+	public Roster createCopy() {
         return new Roster(this);
     }
 
@@ -338,7 +339,8 @@ public class Roster extends IQ {
             return groups;
         }
 
-        public String toString() {
+        @Override
+		public String toString() {
             StringBuffer buf = new StringBuffer();
             buf.append("<item ");
             buf.append("jid=\"").append(jid).append("\"");

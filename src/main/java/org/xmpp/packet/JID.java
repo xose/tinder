@@ -704,7 +704,8 @@ public class JID implements Comparable<JID>, Serializable {
      *
      * @return a String representation of the JID.
      */
-    public String toString() {
+    @Override
+	public String toString() {
     	final StringBuilder sb = new StringBuilder();
     	if (this.node != null) {
     		sb.append(this.node);
@@ -719,11 +720,13 @@ public class JID implements Comparable<JID>, Serializable {
         return sb.toString();
     }
 
-    public int hashCode() {
+    @Override
+	public int hashCode() {
         return toString().hashCode();
     }
 
-    public boolean equals(Object object) {
+    @Override
+	public boolean equals(Object object) {
         if (!(object instanceof JID)) {
             return false;
         }
@@ -759,7 +762,8 @@ public class JID implements Comparable<JID>, Serializable {
         return true;
     }
 
-    public int compareTo(JID jid) {
+    @Override
+	public int compareTo(JID jid) {
         // Comparison order is domain, node, resource.
         int compare = domain.compareTo(jid.domain);
         if (compare == 0) {

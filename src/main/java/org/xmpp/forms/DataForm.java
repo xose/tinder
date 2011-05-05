@@ -354,7 +354,8 @@ public class DataForm extends PacketExtension {
         }
     }
 
-    public DataForm createCopy() {
+    @Override
+	public DataForm createCopy() {
         return new DataForm(this.getElement().createCopy());
     }
 

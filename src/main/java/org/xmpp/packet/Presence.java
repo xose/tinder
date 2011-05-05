@@ -300,7 +300,8 @@ public class Presence extends Packet {
      *
      * @return a deep copy of this Presence.
      */
-    public Presence createCopy() {
+    @Override
+	public Presence createCopy() {
         return new Presence(this);
     }
 

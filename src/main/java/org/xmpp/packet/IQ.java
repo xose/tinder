@@ -271,7 +271,8 @@ public class IQ extends Packet {
      *
      * @param extension the PacketExtension whose element will be added to this Packet's element.
      */
-    public void addExtension(PacketExtension extension) {
+    @Override
+	public void addExtension(PacketExtension extension) {
         Element childElement = getChildElement();
         if (childElement == null) {
             throw new IllegalStateException("Cannot add packet extension when child element is null");
@@ -294,7 +295,8 @@ public class IQ extends Packet {
      * @return a PacketExtension on the first element found in this packet for the specified
      *         name and namespace or <tt>null</tt> if none was found.
      */
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
     public PacketExtension getExtension(String name, String namespace) {
         Element childElement = getChildElement();
         if (childElement == null) {
@@ -336,7 +338,8 @@ public class IQ extends Packet {
      * @param namespace the child element namespace.
      * @return true if a child element was removed.
      */
-    @SuppressWarnings("unchecked")
+    @Override
+	@SuppressWarnings("unchecked")
 	public boolean deleteExtension(String name, String namespace) {
         Element childElement = getChildElement();
         if (childElement == null) {
@@ -356,7 +359,8 @@ public class IQ extends Packet {
      *
      * @return a deep copy of this IQ.
      */
-    public IQ createCopy() {
+    @Override
+	public IQ createCopy() {
         return new IQ(this);
     }
 

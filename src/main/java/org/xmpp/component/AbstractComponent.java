@@ -191,6 +191,7 @@ public abstract class AbstractComponent implements Component {
 	 * @see org.xmpp.component.Component#initialize(org.xmpp.packet.JID,
 	 *      org.xmpp.component.ComponentManager)
 	 */
+	@Override
 	public final void initialize(final JID jid, final ComponentManager componentManager)
 			throws ComponentException {
 		compMan = componentManager;
@@ -203,6 +204,7 @@ public abstract class AbstractComponent implements Component {
 	/**
 	 * @see org.xmpp.component.Component#processPacket(org.xmpp.packet.Packet)
 	 */
+	@Override
 	final public void processPacket(final Packet packet) {
 		final Packet copy = packet.createCopy();
 		
@@ -547,7 +549,7 @@ public abstract class AbstractComponent implements Component {
 		// Doesn't do anything. Override this method to process IQ error
 		// stanzas.
 		log.info("(serving component '{}') IQ stanza "
-				+ "of type <tt>error</tt> received: ", getName(), iq.toXML());
+				+ "of type <tt>error</tt> received: {}", getName(), iq.toXML());
 	}
 
 	/**
@@ -736,6 +738,7 @@ public abstract class AbstractComponent implements Component {
 	 * 
 	 * @see org.xmpp.component.Component#getDescription()
 	 */
+	@Override
 	public abstract String getDescription();
 
 	/*
@@ -743,6 +746,7 @@ public abstract class AbstractComponent implements Component {
 	 * 
 	 * @see org.xmpp.component.Component#getName()
 	 */
+	@Override
 	public abstract String getName();
 
 	/**
@@ -870,6 +874,7 @@ public abstract class AbstractComponent implements Component {
 	 * Default implementation of the shutdown() method of the {@link Component}
 	 * interface.
 	 */
+	@Override
 	public final void shutdown() {
 		preComponentShutdown();
 		closeQueue();
@@ -955,6 +960,7 @@ public abstract class AbstractComponent implements Component {
 	 * called once for each host that we connect to, so we have to take care to
 	 * avoid double initialization.
 	 */
+	@Override
 	public void start() {
 		preComponentStart();
 
@@ -1047,6 +1053,7 @@ public abstract class AbstractComponent implements Component {
 		 * 
 		 * @see java.lang.Runnable#run()
 		 */
+		@Override
 		public void run() {
 			processQueuedPacket(packet);
 		}

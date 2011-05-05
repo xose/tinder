@@ -284,7 +284,8 @@ public class PacketError {
         return element.asXML();
     }
 
-    public String toString() {
+    @Override
+	public String toString() {
         StringWriter out = new StringWriter();
         XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
         try {

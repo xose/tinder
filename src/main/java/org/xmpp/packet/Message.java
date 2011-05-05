@@ -260,7 +260,8 @@ public class Message extends Packet {
      *
      * @return a deep copy of this Message.
      */
-    public Message createCopy() {
+    @Override
+	public Message createCopy() {
         return new Message(this);
     }
 
