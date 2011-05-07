@@ -39,7 +39,7 @@ public class JIDCreationResourceTest {
 	 * A domain identifier that's RFC 3920 valid.
 	 */
 	public static final String DOMAIN = "domain";
-	
+
 	/**
 	 * A resource identifier that's RFC 3920 valid.
 	 */
@@ -95,7 +95,7 @@ public class JIDCreationResourceTest {
 		// do magic / verify
 		new JID(NODE, DOMAIN, toBig);
 	}
-	
+
 	/**
 	 * UTF-8 characters use 1 to 4 bytes. The JID implementation should
 	 * correctly identify the length of all UTF-8 characters.
@@ -149,7 +149,7 @@ public class JIDCreationResourceTest {
 		// do magic / verify
 		new JID(NODE, DOMAIN, longestPossibleValue);
 	}
-	
+
 	/**
 	 * Verifies that the bare representation of a JID that contains a domain
 	 * name and resource identifier corresponds to the domain name only.
@@ -158,11 +158,11 @@ public class JIDCreationResourceTest {
 	public void testBareJID() throws Exception {
 		// setup
 		final JID fullJID = new JID(null, DOMAIN, RESOURCE);
-		
+
 		// do magic
 		final String bareJID = fullJID.toBareJID();
-		
-		// verify 
+
+		// verify
 		assertEquals(DOMAIN, bareJID);
-	}	
+	}
 }

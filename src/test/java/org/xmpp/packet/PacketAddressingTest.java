@@ -41,8 +41,7 @@ public class PacketAddressingTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		final Element element = DocumentFactory.getInstance().createElement(
-				"packet");
+		final Element element = DocumentFactory.getInstance().createElement("packet");
 		packet = new Packet(element) {
 
 			@Override
@@ -189,8 +188,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getFrom());
-		assertEquals(jid.toFullJID(), packet.getElement()
-				.attributeValue("from"));
+		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("from"));
 	}
 
 	/**
@@ -224,8 +222,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getFrom());
-		assertEquals(jid.toFullJID(), packet.getElement()
-				.attributeValue("from"));
+		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("from"));
 	}
 
 	/**

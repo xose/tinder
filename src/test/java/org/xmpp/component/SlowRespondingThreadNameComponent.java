@@ -65,7 +65,7 @@ public class SlowRespondingThreadNameComponent extends DummyAbstractComponent {
 	 * Processes the tinder:debug requests.
 	 */
 	@Override
-	protected IQ handleIQGet(IQ request) throws Exception {
+	protected IQ handleIQGet(final IQ request) throws Exception {
 		final Element element = request.getChildElement();
 		if (!DEBUG_NAMESPACE.equals(element.getNamespaceURI())) {
 			log.debug("Can not process {}", request.toXML());
@@ -73,8 +73,7 @@ public class SlowRespondingThreadNameComponent extends DummyAbstractComponent {
 		}
 
 		if (ELEMENTNAME_SLOWRESPONSE.equals(element.getName())) {
-			log.debug("Waiting 4000 millis before responding to: {}", request
-					.toXML());
+			log.debug("Waiting 4000 millis before responding to: {}", request.toXML());
 			Thread.sleep(4000);
 			log.debug("Responding to {} now.", request.toXML());
 			return IQ.createResultIQ(request);
@@ -83,10 +82,8 @@ public class SlowRespondingThreadNameComponent extends DummyAbstractComponent {
 		if (ELEMENTNAME_THREADNAME.equals(element.getName())) {
 			final String threadName = Thread.currentThread().getName();
 			final IQ response = IQ.createResultIQ(request);
-			response.setChildElement(ELEMENTNAME_THREADNAME, DEBUG_NAMESPACE)
-					.addText(threadName);
-			log.debug("Responding to {} with {}", request.toXML(), response
-					.toXML());
+			response.setChildElement(ELEMENTNAME_THREADNAME, DEBUG_NAMESPACE).addText(threadName);
+			log.debug("Responding to {} with {}", request.toXML(), response.toXML());
 			return response;
 		}
 

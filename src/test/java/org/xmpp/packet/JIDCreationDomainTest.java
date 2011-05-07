@@ -16,7 +16,8 @@
 
 package org.xmpp.packet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -39,70 +40,60 @@ public class JIDCreationDomainTest {
 	 * A domain identifier that's RFC 3920 valid.
 	 */
 	public static final String DOMAIN = "domain";
-	
+
 	/**
 	 * A resource identifier that's RFC 3920 valid.
 	 */
 	public static final String RESOURCE = "resource";
 
 	/**
-	 * Domain identifiers are a required part of a JID. This testcase
-	 * verifies that node identifiers can be left out of the creation of a JID.
+	 * Domain identifiers are a required part of a JID. This testcase verifies
+	 * that node identifiers can be left out of the creation of a JID.
 	 */
 	@Test
 	public void testOptionality() throws Exception {
 		try {
 			new JID(null);
-			fail("Domain identifiers should be a required part of "
-					+ "a JID. No exception occurred while trying to "
-					+ "leave out a domain identifier");
-		} catch (IllegalArgumentException ex) {
+			fail("Domain identifiers should be a required part of a JID. No exception occurred while trying to leave out a domain identifier");
+		} catch (final IllegalArgumentException ex) {
 			// expected
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 			// expected
 		}
 
 		try {
 			new JID(null, null, null);
-			fail("Domain identifiers should be a required part of "
-					+ "a JID. No exception occurred while trying to "
-					+ "leave out a domain identifier");
-		} catch (IllegalArgumentException ex) {
+			fail("Domain identifiers should be a required part of a JID. No exception occurred while trying to leave out a domain identifier");
+		} catch (final IllegalArgumentException ex) {
 			// expected
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 			// expected
 		}
-		
+
 		try {
 			new JID(NODE, null, null);
-			fail("Domain identifiers should be a required part of "
-					+ "a JID. No exception occurred while trying to "
-					+ "leave out a domain identifier");
-		} catch (IllegalArgumentException ex) {
+			fail("Domain identifiers should be a required part of a JID. No exception occurred while trying to leave out a domain identifier");
+		} catch (final IllegalArgumentException ex) {
 			// expected
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 			// expected
 		}
 
 		try {
 			new JID(null, null, RESOURCE);
-			fail("Domain identifiers should be a required part of "
-					+ "a JID. No exception occurred while trying to "
-					+ "leave out a domain identifier");
-		} catch (IllegalArgumentException ex) {
+			fail("Domain identifiers should be a required part of a JID. No exception occurred while trying to leave out a domain identifier");
+		} catch (final IllegalArgumentException ex) {
 			// expected
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 			// expected
 		}
-		
+
 		try {
 			new JID(NODE, null, RESOURCE);
-			fail("Domain identifiers should be a required part of "
-					+ "a JID. No exception occurred while trying to "
-					+ "leave out a domain identifier");
-		} catch (IllegalArgumentException ex) {
+			fail("Domain identifiers should be a required part of a JID. No exception occurred while trying to leave out a domain identifier");
+		} catch (final IllegalArgumentException ex) {
 			// expected
-		} catch (NullPointerException ex) {
+		} catch (final NullPointerException ex) {
 			// expected
 		}
 	}
@@ -143,20 +134,20 @@ public class JIDCreationDomainTest {
 		// do magic / verify
 		new JID(NODE, toBig, RESOURCE);
 	}
-	
+
 	/**
-	 * Verifies that the bare representation of a JID that contains a domain 
+	 * Verifies that the bare representation of a JID that contains a domain
 	 * name only corresponds to the domain name itself.
 	 */
 	@Test
 	public void testBareJID() throws Exception {
 		// setup
 		final JID fullJID = new JID(null, DOMAIN, null);
-		
+
 		// do magic
 		final String bareJID = fullJID.toBareJID();
-		
-		// verify 
+
+		// verify
 		assertEquals(DOMAIN, bareJID);
 	}
 }

@@ -26,7 +26,7 @@ import junitx.extensions.EqualsHashCodeTestCase;
  */
 public class JIDEqualsHashCodeTest extends EqualsHashCodeTestCase {
 
-	public JIDEqualsHashCodeTest(String name) {
+	public JIDEqualsHashCodeTest(final String name) {
 		super(name);
 	}
 

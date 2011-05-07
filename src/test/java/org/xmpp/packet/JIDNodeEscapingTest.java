@@ -46,8 +46,7 @@ public class JIDNodeEscapingTest {
 	 */
 	@Test
 	public void testEscapeNodeExample02() throws Exception {
-		assertEquals(JID.escapeNode("call me \"ishmael\""),
-				"call\\20me\\20\\22ishmael\\22");
+		assertEquals(JID.escapeNode("call me \"ishmael\""), "call\\20me\\20\\22ishmael\\22");
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class JIDNodeEscapingTest {
 	 */
 	@Test
 	public void testEscapeNodeExample11() throws Exception {
-														
+
 		assertEquals(JID.escapeNode("c:\\cool stuff"), "c\\3a\\cool\\20stuff");
 	}
 
@@ -168,8 +167,7 @@ public class JIDNodeEscapingTest {
 	 */
 	@Test
 	public void testUnescapeNodeExample02() throws Exception {
-		assertEquals(JID.unescapeNode("call\\20me\\20\\22ishmael\\22"),
-				"call me \"ishmael\"");
+		assertEquals(JID.unescapeNode("call\\20me\\20\\22ishmael\\22"), "call me \"ishmael\"");
 	}
 
 	/**
@@ -259,8 +257,7 @@ public class JIDNodeEscapingTest {
 	 */
 	@Test
 	public void testUnescapeNodeExample11() throws Exception {
-		assertEquals(JID.unescapeNode("c\\3a\\5ccool\\20stuff"),
-				"c:\\cool stuff");
+		assertEquals(JID.unescapeNode("c\\3a\\5ccool\\20stuff"), "c:\\cool stuff");
 	}
 
 	/**

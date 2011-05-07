@@ -16,7 +16,7 @@
 
 package org.xmpp.packet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.xmpp.packet.PacketError.Condition;
 import org.xmpp.packet.PacketError.Type;
 
 /**
- * Tests compliance of Application-Specific Conditions provided by 
+ * Tests compliance of Application-Specific Conditions provided by
  * {@link PacketError} with the restrictions defined in RFC-3920.
  * 
  * @author G&uuml;nther Nie&szlig;, guenther.niess@web.de
@@ -58,18 +58,13 @@ public class PacketErrorApplicationConditionTest {
 	 */
 	private PacketError applicationError;
 
-
 	/**
 	 * Initialize the used packet-errors.
 	 */
 	@Before
 	public void setUp() {
 		stanzaError = new PacketError(Condition.not_acceptable);
-		applicationError = new PacketError(
-				Condition.undefined_condition,
-				Type.modify,
-				ERROR_TEXT,
-				"en");
+		applicationError = new PacketError(Condition.undefined_condition, Type.modify, ERROR_TEXT, "en");
 	}
 
 	/**
@@ -78,74 +73,65 @@ public class PacketErrorApplicationConditionTest {
 	 */
 	@Test
 	public void testValidBehaviorJustCondition() {
-		String requestErrorName = "stanza-too-big";
+		final String requestErrorName = "stanza-too-big";
 		stanzaError.setApplicationCondition(requestErrorName);
 		if (!requestErrorName.equals(stanzaError.getApplicationConditionName())) {
-			fail("Don't get the applied name of the application-specific "
-					+ "error condition.");
+			fail("Don't get the applied name of the application-specific error condition.");
 		}
-		if (!GENERAL_ERROR_NAMESPACE.equals(
-				stanzaError.getApplicationConditionNamespaceURI())) {
-			fail("According to the XEP-0182 the default namespace of general "
-					+ "application-specific error conditions is " 
-					+ GENERAL_ERROR_NAMESPACE + ". "
-					+ "This namespace should be applied as fallback.");
+		if (!GENERAL_ERROR_NAMESPACE.equals(stanzaError.getApplicationConditionNamespaceURI())) {
+			fail("According to the XEP-0182 the default namespace of general application-specific error conditions is " + GENERAL_ERROR_NAMESPACE
+					+ ". This namespace should be applied as fallback.");
 		}
 	}
-	
+
 	/**
 	 * Testing the default behavior of the setter and getter methods, when an
 	 * application error including a namespace is set.
 	 */
 	@Test
 	public void testValidBehaviorConditionAndNamespace() {
-		String appErrorName = "special-application-condition";
-		String appNS = "application-ns";
+		final String appErrorName = "special-application-condition";
+		final String appNS = "application-ns";
 		applicationError.setApplicationCondition(appErrorName, appNS);
 		if (!appNS.equals(applicationError.getApplicationConditionNamespaceURI())) {
-			fail("Don't get the expected namespace of the application-specific "
-					+ "error condition.");
+			fail("Don't get the expected namespace of the application-specific error condition.");
 		}
 		if (Condition.undefined_condition != applicationError.getCondition()) {
-			fail("The application-specific error condition don't have to modify "
-					+ "the standard error condition.");
+			fail("The application-specific error condition don't have to modify the standard error condition.");
 		}
 		if (!ERROR_TEXT.equals(applicationError.getText())) {
-			fail("The application-specific error condition don't have to modify "
-					+ "the text of the packet-error.");
-		}
-	}
-	
-	/**
-	 * Verifies the valid behavior of this class, even after a previously set condition is removed.
-	 */
-	@Test
-	public void testValidBehaviorReset() {
-		// set error
-		String appErrorName = "special-application-condition";
-		String appNS = "application-ns";
-		applicationError.setApplicationCondition(appErrorName, appNS);
-		
-		// unset error
-		applicationError.setApplicationCondition(null);
-		
-		// verify that unsetting the error propagated correctly.
-		if (applicationError.getApplicationConditionNamespaceURI() != null) {
-			fail("Removing the application-specific error condition don't "
-					+ "remove the namespace of the application.");
-		}
-		if (Condition.undefined_condition != applicationError.getCondition()) {
-			fail("Removing the application-specific error condition don't have "
-					+ "to modify the standard error condition.");
-		}
-		if (!ERROR_TEXT.equals(applicationError.getText())) {
-			fail("Removing the application-specific error condition don't have "
-					+ "to modify the text of the packet-error.");
+			fail("The application-specific error condition don't have to modify the text of the packet-error.");
 		}
 	}
 
 	/**
-	 * Insert an application-specific error, using the namespace 
+	 * Verifies the valid behavior of this class, even after a previously set
+	 * condition is removed.
+	 */
+	@Test
+	public void testValidBehaviorReset() {
+		// set error
+		final String appErrorName = "special-application-condition";
+		final String appNS = "application-ns";
+		applicationError.setApplicationCondition(appErrorName, appNS);
+
+		// unset error
+		applicationError.setApplicationCondition(null);
+
+		// verify that unsetting the error propagated correctly.
+		if (applicationError.getApplicationConditionNamespaceURI() != null) {
+			fail("Removing the application-specific error condition don't remove the namespace of the application.");
+		}
+		if (Condition.undefined_condition != applicationError.getCondition()) {
+			fail("Removing the application-specific error condition don't have to modify the standard error condition.");
+		}
+		if (!ERROR_TEXT.equals(applicationError.getText())) {
+			fail("Removing the application-specific error condition don't have to modify the text of the packet-error.");
+		}
+	}
+
+	/**
+	 * Insert an application-specific error, using the namespace
 	 * urn:ietf:params:xml:ns:xmpp-stanzas isn't allowed by RFC 3920.
 	 */
 	@Test(expected = IllegalArgumentException.class)

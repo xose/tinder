@@ -25,20 +25,21 @@ package org.xmpp.resultsetmanagement;
  * your class managable/navigable.
  * 
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
- * @see <a href="http://www.xmpp.org/extensions/xep-0059.html">XEP-0059: Result Set Management</a>
+ * @see <a href="http://www.xmpp.org/extensions/xep-0059.html">XEP-0059: Result
+ *      Set Management</a>
  */
 public interface Result {
 
 	/**
 	 * Returns a unique identifier for this Result. Each element in a ResultSet
-	 * must have a distinct UIDs. 
+	 * must have a distinct UIDs.
 	 * 
-	 * XEP-0059 says: <quote>(...) the UIDs are
-	 * unique in the context of all possible members of the full result set.
-	 * Each UID MAY be based on part of the content of its associated item (...)
-	 * or on an internal table index. Another possible method is to serialize
-	 * the XML of the item and then hash it to generate the UID. Note: The
-	 * requesting entity MUST treat all UIDs as opaque.</quote>
+	 * XEP-0059 says: <quote>(...) the UIDs are unique in the context of all
+	 * possible members of the full result set. Each UID MAY be based on part of
+	 * the content of its associated item (...) or on an internal table index.
+	 * Another possible method is to serialize the XML of the item and then hash
+	 * it to generate the UID. Note: The requesting entity MUST treat all UIDs
+	 * as opaque.</quote>
 	 * 
 	 * @return Unique ID of the Result
 	 */

@@ -12,7 +12,8 @@ import org.junit.Test;
  * <li><tt>/</tt> (forward slash)</li>
  * </ul>
  * 
- * Tests in this class verify that usage of those characters as part of the JID is processed correctly.
+ * Tests in this class verify that usage of those characters as part of the JID
+ * is processed correctly.
  * 
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
  */
@@ -30,8 +31,9 @@ public class JIDDelimiterCharsTest {
 	}
 
 	/**
-	 * Slashes are not allowed in the 'node' part of a JID. Beware that in some cases, "slashes in nodes" are actually
-	 * the delimiter separating the domain and resource portions of a JID!
+	 * Slashes are not allowed in the 'node' part of a JID. Beware that in some
+	 * cases, "slashes in nodes" are actually the delimiter separating the
+	 * domain and resource portions of a JID!
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testSlashInNode_A() {
@@ -129,7 +131,8 @@ public class JIDDelimiterCharsTest {
 	}
 
 	/**
-	 * At-characters are not allowed in the 'node' part of a JID (nor in domains).
+	 * At-characters are not allowed in the 'node' part of a JID (nor in
+	 * domains).
 	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void testAtCharInNode_A() {

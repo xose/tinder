@@ -22,8 +22,8 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 import org.xmpp.packet.IQ;
-import org.xmpp.packet.JID;
 import org.xmpp.packet.IQ.Type;
+import org.xmpp.packet.JID;
 
 /**
  * Basic tests for the {@link AbstractComponent} implementation. The initial
@@ -49,8 +49,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("from.address");
 		pingRequest.setTo(component.jid);
 
@@ -84,8 +83,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("from.address");
 		pingRequest.setTo(component.jid);
 
@@ -122,8 +120,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("user@notthesame" + component.getDomain());
 		pingRequest.setTo(component.jid);
 
@@ -158,8 +155,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("user@" + component.getDomain());
 		pingRequest.setTo(component.jid);
 
@@ -194,8 +190,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("user@notthesame" + component.getDomain());
 		pingRequest.setTo(component.jid);
 
@@ -209,7 +204,7 @@ public class AbstractComponentTest {
 		assertEquals(Type.result, response.getType());
 		assertEquals(pingRequest.getID(), response.getID());
 	}
-	
+
 	/**
 	 * Verifies that no IQ error is returned if a request is sent from a local
 	 * entity to be processed by a component that is configured to serve
@@ -230,8 +225,7 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("user@" + component.getDomain());
 		pingRequest.setTo(component.jid);
 
@@ -298,13 +292,14 @@ public class AbstractComponentTest {
 		component.start();
 		component.shutdown();
 		component.start();
-		
+
 		// verify
 		assertEquals(jid, component.jid);
 	}
 
 	/**
-	 * An AbstractComponent must expose its assigned domain after it has been initialized.
+	 * An AbstractComponent must expose its assigned domain after it has been
+	 * initialized.
 	 */
 	@Test
 	public void testCorrectJID() throws Exception {
@@ -317,10 +312,10 @@ public class AbstractComponentTest {
 		// verify
 		assertEquals(jid.getDomain(), component.getDomain());
 	}
-	
+
 	/**
-	 * This test verifies that the abstract component responds to XMPP Last Activity
-	 * requests correctly.
+	 * This test verifies that the abstract component responds to XMPP Last
+	 * Activity requests correctly.
 	 * 
 	 * @see <a
 	 *      href="http://www.igniterealtime.org/issues/browse/TINDER-38">Tinder&nbsp;bugtracker:&nbsp;TINDER-38</a>
@@ -332,15 +327,14 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping",
-				AbstractComponent.NAMESPACE_LAST_ACTIVITY);
+		request.setChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
 		request.setFrom("from.address");
 		request.setTo(component.jid);
 		final int wait = 2;
-		
+
 		// do magic
 		component.start();
-		Thread.sleep(wait*1000);
+		Thread.sleep(wait * 1000);
 		component.processPacket(request);
 
 		// verify
@@ -349,10 +343,10 @@ public class AbstractComponentTest {
 		assertEquals(Type.result, result.getType());
 		assertEquals(String.valueOf(wait), result.getChildElement().attributeValue("seconds"));
 	}
-	
+
 	/**
-	 * This test verifies that the abstract component responds to XMPP Last Activity
-	 * requests correctly, after the component has been restarted.
+	 * This test verifies that the abstract component responds to XMPP Last
+	 * Activity requests correctly, after the component has been restarted.
 	 * 
 	 * @see <a
 	 *      href="http://www.igniterealtime.org/issues/browse/TINDER-38">Tinder&nbsp;bugtracker:&nbsp;TINDER-38</a>
@@ -364,18 +358,17 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping",
-				AbstractComponent.NAMESPACE_LAST_ACTIVITY);
+		request.setChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
 		request.setFrom("from.address");
 		request.setTo(component.jid);
 		final int wait = 2;
-		
+
 		// do magic
 		component.start();
-		Thread.sleep(wait*1000);
+		Thread.sleep(wait * 1000);
 		component.shutdown();
 		component.start();
-		Thread.sleep(wait*1000);
+		Thread.sleep(wait * 1000);
 		component.processPacket(request);
 
 		// verify
@@ -384,9 +377,10 @@ public class AbstractComponentTest {
 		assertEquals(Type.result, result.getType());
 		assertEquals(String.valueOf(wait), result.getChildElement().attributeValue("seconds"));
 	}
-	
+
 	/**
-	 * This test verifies that the abstract component responds to XMPP Entity Time requests.
+	 * This test verifies that the abstract component responds to XMPP Entity
+	 * Time requests.
 	 */
 	@Test
 	public void testEntityTime() throws Exception {
@@ -395,20 +389,19 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping",
-				AbstractComponent.NAMESPACE_ENTITY_TIME);
+		request.setChildElement("ping", AbstractComponent.NAMESPACE_ENTITY_TIME);
 		request.setFrom("from.address");
 		request.setTo(component.jid);
 
-		
 		// do magic
 		component.start();
 		component.processPacket(request);
-		
+
 		// verify
 		final IQ result = (IQ) component.getSentPacket();
 		assertNotNull(result);
 		assertEquals(Type.result, result.getType());
-		// TODO although this test verifies that a result is produced, it also needs to verify the correctness of the content of the result.
+		// TODO although this test verifies that a result is produced, it also
+		// needs to verify the correctness of the content of the result.
 	}
 }

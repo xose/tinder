@@ -38,7 +38,8 @@ import org.xmpp.forms.FormField.Type;
  * This test should identify problems such as TINDER-12
  * 
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
- * @see <a href="http://www.igniterealtime.org/issues/browse/TINDER-12">http://www.igniterealtime.org/issues/browse/TINDER-12</a>
+ * @see <a
+ *      href="http://www.igniterealtime.org/issues/browse/TINDER-12">http://www.igniterealtime.org/issues/browse/TINDER-12</a>
  */
 public class FormFieldGetSetTest {
 

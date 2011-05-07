@@ -74,9 +74,7 @@ public class AbstractComponentIsConsumerTest {
 		// setup
 		final String producerThreadName = Thread.currentThread().getName();
 		final IQ request = new IQ(Type.get);
-		request.setChildElement(
-				SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME,
-				SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 
 		// do magic
 		debugComp.processPacket(request);
@@ -101,9 +99,7 @@ public class AbstractComponentIsConsumerTest {
 	public void consumesAsynchronouslyTest() throws Exception {
 		// setup
 		final IQ request = new IQ(Type.get);
-		request.setChildElement(
-				SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE,
-				SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 
 		// do magic
 		final long start = System.currentTimeMillis();

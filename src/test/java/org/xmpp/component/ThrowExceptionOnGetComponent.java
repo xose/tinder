@@ -32,7 +32,7 @@ public class ThrowExceptionOnGetComponent extends DummyAbstractComponent {
 	 * Throw an exception
 	 */
 	@Override
-	protected IQ handleIQGet(IQ request) throws Exception {
+	protected IQ handleIQGet(final IQ request) throws Exception {
 		throw new Exception("This exception is expected to be thrown. It is used during unit testing.");
 	}
 }

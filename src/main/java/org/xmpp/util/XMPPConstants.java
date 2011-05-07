@@ -24,39 +24,40 @@ public class XMPPConstants {
 	/**
 	 * The amount of milliseconds in one second.
 	 */
-    public static final long SECOND = 1000;
+	public static final long SECOND = 1000;
 
 	/**
 	 * The amount of milliseconds in one minute.
 	 */
-    public static final long MINUTE = 60 * SECOND;
-    
-	/**
-	 * The amount of milliseconds in one .
-	 */
-    public static final long HOUR = 60 * MINUTE;
-    
-	/**
-	 * The amount of milliseconds in one .
-	 */
-    public static final long DAY = 24 * HOUR;
-    
-	/**
-	 * The amount of milliseconds in one .
-	 */
-    public static final long WEEK = 7 * DAY;
+	public static final long MINUTE = 60 * SECOND;
 
-    /**
-     * Date/time format for use by SimpleDateFormat. The format conforms to
-     * <a href="http://www.xmpp.org/extensions/xep-0082.html">XEP-0082</a>, which defines
-     * a unified date/time format for XMPP.
-     */
-    public static final String XMPP_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+	/**
+	 * The amount of milliseconds in one .
+	 */
+	public static final long HOUR = 60 * MINUTE;
 
-    /**
-     * Date/time format for use by SimpleDateFormat. The format conforms to the format
-     * defined in <a href="http://www.xmpp.org/extensions/xep-0091.html">XEP-0091</a>,
-     * a specialized date format for historical XMPP usage.
-     */
-    public static final String XMPP_DELAY_DATETIME_FORMAT = "yyyyMMdd'T'HH:mm:ss";
+	/**
+	 * The amount of milliseconds in one .
+	 */
+	public static final long DAY = 24 * HOUR;
+
+	/**
+	 * The amount of milliseconds in one .
+	 */
+	public static final long WEEK = 7 * DAY;
+
+	/**
+	 * Date/time format for use by SimpleDateFormat. The format conforms to <a
+	 * href="http://www.xmpp.org/extensions/xep-0082.html">XEP-0082</a>, which
+	 * defines a unified date/time format for XMPP.
+	 */
+	public static final String XMPP_DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+
+	/**
+	 * Date/time format for use by SimpleDateFormat. The format conforms to the
+	 * format defined in <a
+	 * href="http://www.xmpp.org/extensions/xep-0091.html">XEP-0091</a>, a
+	 * specialized date format for historical XMPP usage.
+	 */
+	public static final String XMPP_DELAY_DATETIME_FORMAT = "yyyyMMdd'T'HH:mm:ss";
 }

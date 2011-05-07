@@ -20,42 +20,42 @@ import org.xmpp.packet.StreamError;
 
 /**
  * Thrown when an exception occors with a Component.
- *
+ * 
  * @author Matt Tucker
  */
 public class ComponentException extends Exception {
 
 	private static final long serialVersionUID = -4133202596762415887L;
-	
+
 	private StreamError streamError;
 
-    public ComponentException() {
-        super();
-    }
+	public ComponentException() {
+		super();
+	}
 
-    public ComponentException(String message) {
-        super(message);
-    }
+	public ComponentException(final String message) {
+		super(message);
+	}
 
-    public ComponentException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public ComponentException(final String message, final Throwable cause) {
+		super(message, cause);
+	}
 
-    public ComponentException(Throwable cause) {
-        super(cause);
-    }
+	public ComponentException(final Throwable cause) {
+		super(cause);
+	}
 
-    public ComponentException(String message, StreamError streamError) {
-        super(message);
-        this.streamError = streamError;
-    }
+	public ComponentException(final String message, final StreamError streamError) {
+		super(message);
+		this.streamError = streamError;
+	}
 
-    public ComponentException(StreamError streamError) {
-        super(streamError.getCondition().toXMPP());
-        this.streamError = streamError;
-    }
+	public ComponentException(final StreamError streamError) {
+		super(streamError.getCondition().toXMPP());
+		this.streamError = streamError;
+	}
 
-    public StreamError getStreamError() {
-        return streamError;
-    }
+	public StreamError getStreamError() {
+		return streamError;
+	}
 }

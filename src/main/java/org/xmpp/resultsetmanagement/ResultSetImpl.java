@@ -16,7 +16,13 @@
 
 package org.xmpp.resultsetmanagement;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
 
 import net.jcip.annotations.NotThreadSafe;
 
@@ -78,7 +84,7 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @param results
 	 *            The collection of Results that make up this result set.
 	 */
-	public ResultSetImpl(Collection<E> results) {
+	public ResultSetImpl(final Collection<E> results) {
 		this(results, null);
 	}
 
@@ -99,10 +105,9 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 *            The Comparator that defines the order of the Results in this
 	 *            result set.
 	 */
-	public ResultSetImpl(Collection<E> results, Comparator<E> comparator) {
-		if (results == null) {
+	public ResultSetImpl(final Collection<E> results, final Comparator<E> comparator) {
+		if (results == null)
 			throw new NullPointerException("Argument 'results' cannot be null.");
-		}
 
 		final int size = results.size();
 		resultList = new ArrayList<E>(size);
@@ -117,17 +122,13 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 
 		int index = 0;
 		// iterate over either the sorted or unsorted collection
-		for (final E result : (sortedResults != null ? sortedResults : results)) {
-			if (result == null) {
-				throw new NullPointerException(
-						"The result set must not contain 'null' elements.");
-			}
+		for (final E result : sortedResults != null ? sortedResults : results) {
+			if (result == null)
+				throw new NullPointerException("The result set must not contain 'null' elements.");
 
 			final String uid = result.getUID();
-			if (uidToIndex.containsKey(uid)) {
-				throw new IllegalArgumentException(
-						"The result set can not contain elements that have the same UID.");
-			}
+			if (uidToIndex.containsKey(uid))
+				throw new IllegalArgumentException("The result set can not contain elements that have the same UID.");
 
 			resultList.add(result);
 			uidToIndex.put(uid, index);
@@ -151,15 +152,12 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#getAfter(E, int)
 	 */
 	@Override
-	public List<E> getAfter(String uid, int maxAmount) {
-		if (uid == null || uid.length() == 0) {
+	public List<E> getAfter(final String uid, final int maxAmount) {
+		if (uid == null || uid.length() == 0)
 			throw new NullPointerException("Argument 'uid' cannot be null or an empty String.");
-		}
 
-		if (maxAmount < 1) {
-			throw new IllegalArgumentException(
-					"Argument 'maxAmount' must be a integer higher than zero.");
-		}
+		if (maxAmount < 1)
+			throw new IllegalArgumentException("Argument 'maxAmount' must be a integer higher than zero.");
 
 		// the result of this method is exclusive 'result'
 		final int index = uidToIndex.get(uid) + 1;
@@ -173,23 +171,19 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#getBefore(E, int)
 	 */
 	@Override
-	public List<E> getBefore(String uid, int maxAmount) {
-		if (uid == null || uid.length() == 0) {
+	public List<E> getBefore(final String uid, final int maxAmount) {
+		if (uid == null || uid.length() == 0)
 			throw new NullPointerException("Argument 'uid' cannot be null or an empty String.");
-		}
 
-		if (maxAmount < 1) {
-			throw new IllegalArgumentException(
-					"Argument 'maxAmount' must be a integer higher than zero.");
-		}
+		if (maxAmount < 1)
+			throw new IllegalArgumentException("Argument 'maxAmount' must be a integer higher than zero.");
 
 		// the result of this method is exclusive 'result'
 		final int indexOfLastElement = uidToIndex.get(uid);
 		final int indexOfFirstElement = indexOfLastElement - maxAmount;
 
-		if (indexOfFirstElement < 0) {
+		if (indexOfFirstElement < 0)
 			return get(0, indexOfLastElement);
-		}
 
 		return get(indexOfFirstElement, maxAmount);
 	}
@@ -200,7 +194,7 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#get(int)
 	 */
 	@Override
-	public E get(int index) {
+	public E get(final int index) {
 		return resultList.get(index);
 	}
 
@@ -210,11 +204,9 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#getFirst(int)
 	 */
 	@Override
-	public List<E> getFirst(int maxAmount) {
-		if (maxAmount < 1) {
-			throw new IllegalArgumentException(
-					"Argument 'maxAmount' must be a integer higher than zero.");
-		}
+	public List<E> getFirst(final int maxAmount) {
+		if (maxAmount < 1)
+			throw new IllegalArgumentException("Argument 'maxAmount' must be a integer higher than zero.");
 
 		return get(0, maxAmount);
 	}
@@ -225,17 +217,14 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#getLast(int)
 	 */
 	@Override
-	public List<E> getLast(int maxAmount) {
-		if (maxAmount < 1) {
-			throw new IllegalArgumentException(
-					"Argument 'maxAmount' must be a integer higher than zero.");
-		}
+	public List<E> getLast(final int maxAmount) {
+		if (maxAmount < 1)
+			throw new IllegalArgumentException("Argument 'maxAmount' must be a integer higher than zero.");
 
 		final int indexOfFirstElement = size() - maxAmount;
 
-		if (indexOfFirstElement < 0) {
+		if (indexOfFirstElement < 0)
 			return get(0, maxAmount);
-		}
 
 		return get(indexOfFirstElement, maxAmount);
 	}
@@ -246,35 +235,33 @@ public class ResultSetImpl<E extends Result> extends ResultSet<E> {
 	 * @see com.buzzaa.xmpp.resultsetmanager.ResultSet#get(int, int)
 	 */
 	@Override
-	public List<E> get(int fromIndex, int maxAmount) {
-		if (fromIndex < 0) {
-			throw new IllegalArgumentException(
-					"Argument 'fromIndex' must be zero or higher.");
-		}
+	public List<E> get(final int fromIndex, final int maxAmount) {
+		if (fromIndex < 0)
+			throw new IllegalArgumentException("Argument 'fromIndex' must be zero or higher.");
 
-		if (maxAmount < 1) {
-			throw new IllegalArgumentException(
-					"Argument 'maxAmount' must be a integer higher than zero.");
-		}
+		if (maxAmount < 1)
+			throw new IllegalArgumentException("Argument 'maxAmount' must be a integer higher than zero.");
 
-		if (fromIndex >= size()) {
+		if (fromIndex >= size())
 			return new ArrayList<E>(0);
-		}
 
 		// calculate the last index to return, or return up to the end of last
 		// index if 'amount' surpasses the list length.
 		final int absoluteTo = fromIndex + maxAmount;
-		final int toIndex = (absoluteTo > size() ? size() : absoluteTo);
+		final int toIndex = absoluteTo > size() ? size() : absoluteTo;
 
 		return resultList.subList(fromIndex, toIndex);
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.jivesoftware.util.resultsetmanager.ResultSet#indexOf(java.lang.String)
+	 * 
+	 * @see
+	 * org.jivesoftware.util.resultsetmanager.ResultSet#indexOf(java.lang.String
+	 * )
 	 */
 	@Override
-	public int indexOf(String uid) {
+	public int indexOf(final String uid) {
 		return uidToIndex.get(uid);
 	}
 }

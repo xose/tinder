@@ -56,11 +56,11 @@ public class JIDSerializabilityTest {
 	@Test
 	public void testIsSerializable() throws Exception {
 		// setup
-		JID test = new JID("a", "b.com", "c");
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final JID test = new JID("a", "b.com", "c");
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
 		// do magic
-		ObjectOutputStream oos = new ObjectOutputStream(out);
+		final ObjectOutputStream oos = new ObjectOutputStream(out);
 		oos.writeObject(test);
 		oos.close();
 
@@ -81,20 +81,20 @@ public class JIDSerializabilityTest {
 	public void testRoundTripSerialization() throws Exception {
 
 		// construct test object
-		JID original = new JID("a", "b.com", "c");
+		final JID original = new JID("a", "b.com", "c");
 
 		// serialize
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(out);
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final ObjectOutputStream oos = new ObjectOutputStream(out);
 		oos.writeObject(original);
 		oos.close();
 
 		// deserialize
-		byte[] pickled = out.toByteArray();
-		InputStream in = new ByteArrayInputStream(pickled);
-		ObjectInputStream ois = new ObjectInputStream(in);
-		Object o = ois.readObject();
-		JID copy = (JID) o;
+		final byte[] pickled = out.toByteArray();
+		final InputStream in = new ByteArrayInputStream(pickled);
+		final ObjectInputStream ois = new ObjectInputStream(in);
+		final Object o = ois.readObject();
+		final JID copy = (JID) o;
 
 		// test the result
 		assertEquals(original.getNode(), copy.getNode());
@@ -132,8 +132,7 @@ public class JIDSerializabilityTest {
 		final JID original = new JID("abc", "dom4in.com", "@home", true);
 
 		// deserialize
-		final InputStream in = getClass().getResourceAsStream(
-				"/jid-version-tinder1.1.serialized");
+		final InputStream in = getClass().getResourceAsStream("/jid-version-tinder1.1.serialized");
 		final ObjectInputStream ois = new ObjectInputStream(in);
 		final Object o = ois.readObject();
 		final JID deserialized = (JID) o;

@@ -16,65 +16,69 @@
 
 package org.xmpp.muc;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.jcip.annotations.NotThreadSafe;
 
 import org.dom4j.Element;
 import org.xmpp.packet.IQ;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
 /**
- * RoomConfiguration is a packet that helps to set the configuration of MUC rooms. RoomConfiguration
- * is a speacial IQ packet whose child element contains a data form. The data form holds the fields
- * to set together with a list of values.<p>
- *
+ * RoomConfiguration is a packet that helps to set the configuration of MUC
+ * rooms. RoomConfiguration is a speacial IQ packet whose child element contains
+ * a data form. The data form holds the fields to set together with a list of
+ * values.
+ * <p>
+ * 
  * Code example:
+ * 
  * <pre>
  * // Set the fields and the values.
- * Map<String,Collection<String>> fields = new HashMap<String,Collection<String>>();
+ * Map&lt;String, Collection&lt;String&gt;&gt; fields = new HashMap&lt;String, Collection&lt;String&gt;&gt;();
  * // Make a non-public room
- * List<String> values = new ArrayList<String>();
- * values.add("0");
- * fields.put("muc#roomconfig_publicroom", values);
- *
+ * List&lt;String&gt; values = new ArrayList&lt;String&gt;();
+ * values.add(&quot;0&quot;);
+ * fields.put(&quot;muc#roomconfig_publicroom&quot;, values);
+ * 
  * // Create a RoomConfiguration with the fields and values
  * RoomConfiguration conf = new RoomConfiguration(fields);
- * conf.setTo("room@conference.jabber.org");
- * conf.setFrom("john@jabber.org/notebook");
- *
+ * conf.setTo(&quot;room@conference.jabber.org&quot;);
+ * conf.setFrom(&quot;john@jabber.org/notebook&quot;);
+ * 
  * component.sendPacket(conf);
  * </pre>
- *
+ * 
  * @author Gaston Dombiak
  */
 @NotThreadSafe
 public class RoomConfiguration extends IQ {
 
-    /**
-     * Creates a new IQ packet that contains the field and values to send for setting the room
-     * configuration.
-     *
-     * @param fieldValues the list of fields associated with the list of values.
-     */
-    public RoomConfiguration(Map<String,Collection<String>> fieldValues) {
-        super();
-        setType(Type.set);
-        Element query = setChildElement("query", "http://jabber.org/protocol/muc#owner");
-        Element form = query.addElement("x", "jabber:x:data");
-        form.addAttribute("type", "submit");
-        // Add static field
-        Element field = form.addElement("field");
-        field.addAttribute("var", "FORM_TYPE");
-        field.addElement("value").setText("http://jabber.org/protocol/muc#roomconfig");
-        // Add the specified fields and their corresponding values
-        for (Entry<String, Collection<String>> entry : fieldValues.entrySet()) {
-            field = form.addElement("field");
-            field.addAttribute("var", entry.getKey());
-            for (String value : entry.getValue()) {
-                field.addElement("value").setText(value);
-            }
-        }
-    }
+	/**
+	 * Creates a new IQ packet that contains the field and values to send for
+	 * setting the room configuration.
+	 * 
+	 * @param fieldValues
+	 *            the list of fields associated with the list of values.
+	 */
+	public RoomConfiguration(final Map<String, Collection<String>> fieldValues) {
+		super();
+		setType(Type.set);
+		final Element query = setChildElement("query", "http://jabber.org/protocol/muc#owner");
+		final Element form = query.addElement("x", "jabber:x:data");
+		form.addAttribute("type", "submit");
+		// Add static field
+		Element field = form.addElement("field");
+		field.addAttribute("var", "FORM_TYPE");
+		field.addElement("value").setText("http://jabber.org/protocol/muc#roomconfig");
+		// Add the specified fields and their corresponding values
+		for (final Entry<String, Collection<String>> entry : fieldValues.entrySet()) {
+			field = form.addElement("field");
+			field.addAttribute("var", entry.getKey());
+			for (final String value : entry.getValue()) {
+				field.addElement("value").setText(value);
+			}
+		}
+	}
 }

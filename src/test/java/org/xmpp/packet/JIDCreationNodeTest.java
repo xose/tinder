@@ -39,7 +39,7 @@ public class JIDCreationNodeTest {
 	 * A domain identifier that's RFC 3920 valid.
 	 */
 	public static final String DOMAIN = "domain";
-	
+
 	/**
 	 * A resource identifier that's RFC 3920 valid.
 	 */
@@ -157,11 +157,11 @@ public class JIDCreationNodeTest {
 	public void testBareJID() throws Exception {
 		// setup
 		final JID fullJID = new JID(NODE, DOMAIN, null);
-		
+
 		// do magic
 		final String bareJID = fullJID.toBareJID();
-		
-		// verify 
+
+		// verify
 		assertEquals(NODE + '@' + DOMAIN, bareJID);
 	}
 }

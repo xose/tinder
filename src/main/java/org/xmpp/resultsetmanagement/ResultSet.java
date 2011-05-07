@@ -16,11 +16,16 @@
 
 package org.xmpp.resultsetmanagement;
 
+import java.util.AbstractCollection;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
-
-import java.util.*;
 
 /**
  * A result set representation as described in XEP-0059. A result set is a
@@ -75,7 +80,7 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 * @throws NullPointerException
 	 *             if the result does not exist in the result set.
 	 */
-	public List<E> getAfter(E result, int maxAmount) {
+	public List<E> getAfter(final E result, final int maxAmount) {
 		return getAfter(result.getUID(), maxAmount);
 	}
 
@@ -121,7 +126,7 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 *             if the result does not exist in the result set.
 	 * 
 	 */
-	public List<E> getBefore(E result, int maxAmount) {
+	public List<E> getBefore(final E result, final int maxAmount) {
 		return getBefore(result.getUID(), maxAmount);
 	}
 
@@ -200,7 +205,7 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 *            The index of the UID to be returned.
 	 * @return UID of the object on the specified index.
 	 */
-	public String getUID(int index) {
+	public String getUID(final int index) {
 		return get(index).getUID();
 	}
 
@@ -224,7 +229,7 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 *            The element to search for
 	 * @return The index of the element.
 	 */
-	public int indexOf(E element) {
+	public int indexOf(final E element) {
 		return indexOf(element.getUID());
 	}
 
@@ -246,20 +251,17 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 * @param rsmElement
 	 *            The XML element that contains the 'result set management'
 	 *            directives.
-     * @return a list of Results that matches the directives.
+	 * @return a list of Results that matches the directives.
 	 */
-	public List<E> applyRSMDirectives(Element rsmElement) {
-		if (rsmElement == null || !isValidRSMRequest(rsmElement)) {
-			throw new IllegalArgumentException(
-					"The 'rsmElement' argument must be a valid, non-null RSM element.");
-		}
+	public List<E> applyRSMDirectives(final Element rsmElement) {
+		if (rsmElement == null || !isValidRSMRequest(rsmElement))
+			throw new IllegalArgumentException("The 'rsmElement' argument must be a valid, non-null RSM element.");
 
 		final int max = Integer.parseInt(rsmElement.element("max").getText());
 
-		if (max == 0) {
+		if (max == 0)
 			// this is a request for a resultset count.
 			return Collections.emptyList();
-		}
 
 		// optional elements
 		final Element afterElement = rsmElement.element("after");
@@ -293,15 +295,13 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 		}
 
 		if (isForwardOriented) {
-			if (pointerUID == null) {
+			if (pointerUID == null)
 				return getFirst(max);
-			}
 			return getAfter(pointerUID, max);
 		}
 
-		if (pointerUID == null) {
+		if (pointerUID == null)
 			return getLast(max);
-		}
 		return getBefore(pointerUID, max);
 	}
 
@@ -316,13 +316,10 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 * @return An Element named 'set' that can be included in the result IQ
 	 *         stanza, which returns the subset of results.
 	 */
-	public Element generateSetElementFromResults(List<E> returnedResults) {
-		if (returnedResults == null) {
-			throw new IllegalArgumentException(
-					"Argument 'returnedResults' cannot be null.");
-		}
-		final Element setElement = DocumentHelper.createElement(QName.get(
-				"set", ResultSet.NAMESPACE_RESULT_SET_MANAGEMENT));
+	public Element generateSetElementFromResults(final List<E> returnedResults) {
+		if (returnedResults == null)
+			throw new IllegalArgumentException("Argument 'returnedResults' cannot be null.");
+		final Element setElement = DocumentHelper.createElement(QName.get("set", ResultSet.NAMESPACE_RESULT_SET_MANAGEMENT));
 		// the size element contains the size of this entire result set.
 		setElement.addElement("count").setText(String.valueOf(size()));
 
@@ -330,11 +327,9 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 		if (returnedResults.size() > 0) {
 			final Element firstElement = setElement.addElement("first");
 			firstElement.addText(returnedResults.get(0).getUID());
-			firstElement.addAttribute("index", String
-					.valueOf(indexOf(returnedResults.get(0))));
+			firstElement.addAttribute("index", String.valueOf(indexOf(returnedResults.get(0))));
 
-			setElement.addElement("last").addText(
-					returnedResults.get(returnedResults.size() - 1).getUID());
+			setElement.addElement("last").addText(returnedResults.get(returnedResults.size() - 1).getUID());
 		}
 
 		return setElement;
@@ -351,75 +346,63 @@ public abstract class ResultSet<E extends Result> extends AbstractCollection<E> 
 	 */
 	// Dom4J doesn't do generics, sadly.
 	@SuppressWarnings("unchecked")
-	public static boolean isValidRSMRequest(Element rsmElement) {
-		if (rsmElement == null) {
-			throw new IllegalArgumentException(
-					"The argument 'rsmElement' cannot be null.");
-		}
+	public static boolean isValidRSMRequest(final Element rsmElement) {
+		if (rsmElement == null)
+			throw new IllegalArgumentException("The argument 'rsmElement' cannot be null.");
 
-		if (!rsmElement.getName().equals("set")) {
+		if (!rsmElement.getName().equals("set"))
 			// the name of the element must be "set".
 			return false;
-		}
 
-		if (!rsmElement.getNamespaceURI().equals(
-				NAMESPACE_RESULT_SET_MANAGEMENT)) {
+		if (!rsmElement.getNamespaceURI().equals(NAMESPACE_RESULT_SET_MANAGEMENT))
 			// incorrect namespace
 			return false;
-		}
 
 		final Element maxElement = rsmElement.element("max");
-		if (maxElement == null) {
+		if (maxElement == null)
 			// The 'max' element in an RSM request must be available
 			return false;
-		}
 
 		final String sMax = maxElement.getText();
-		if (sMax == null || sMax.length() == 0) {
+		if (sMax == null || sMax.length() == 0)
 			// max element must contain a value.
 			return false;
-		}
 
 		try {
-			if (Integer.parseInt(sMax) < 0) {
+			if (Integer.parseInt(sMax) < 0)
 				// must be a postive integer.
 				return false;
-			}
-		} catch (NumberFormatException e) {
+		} catch (final NumberFormatException e) {
 			// the value of 'max' must be an integer value.
 			return false;
 		}
 
-		List<Element> allElements = rsmElement.elements();
+		final List<Element> allElements = rsmElement.elements();
 		int optionalElements = 0;
-		for (Element element : allElements) {
+		for (final Element element : allElements) {
 			final String name = element.getName();
-			if (!validRequestFields.contains(name)) {
+			if (!validRequestFields.contains(name))
 				// invalid element.
 				return false;
-			}
 
 			if (!name.equals("max")) {
 				optionalElements++;
 			}
 
-			if (optionalElements > 1) {
+			if (optionalElements > 1)
 				// only one optional element is allowed.
 				return false;
-			}
 
 			if (name.equals("index")) {
 				final String value = element.getText();
-				if (value == null || value.equals("")) {
+				if (value == null || value.equals(""))
 					// index elements must have a numberic value.
 					return false;
-				}
 				try {
-					if (Integer.parseInt(value) < 0) {
+					if (Integer.parseInt(value) < 0)
 						// index values must be positive.
 						return false;
-					}
-				} catch (NumberFormatException e) {
+				} catch (final NumberFormatException e) {
 					// index values must be numeric.
 					return false;
 				}

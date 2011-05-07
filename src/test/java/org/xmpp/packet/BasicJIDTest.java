@@ -36,7 +36,7 @@ public class BasicJIDTest {
 	public void testEmptyArgument() {
 		new JID("");
 	}
-		
+
 	@Test
 	public void testC1FullJID() {
 		// setup

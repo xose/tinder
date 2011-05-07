@@ -82,10 +82,9 @@ public class ValueWrapper<V> implements Serializable {
 	 * @param representation
 	 *            Key representation indicator.
 	 */
-	public ValueWrapper(Representation representation) {
-		if (representation == Representation.USE_VALUE) {
+	public ValueWrapper(final Representation representation) {
+		if (representation == Representation.USE_VALUE)
 			throw new IllegalArgumentException();
-		}
 
 		this.representation = representation;
 		this.value = null;
@@ -97,7 +96,7 @@ public class ValueWrapper<V> implements Serializable {
 	 * @param value
 	 *            The value that is wrapped.
 	 */
-	public ValueWrapper(V value) {
+	public ValueWrapper(final V value) {
 		this.representation = Representation.USE_VALUE;
 		this.value = value;
 	}

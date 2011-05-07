@@ -28,12 +28,12 @@ import org.dom4j.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xmpp.packet.IQ;
+import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 import org.xmpp.packet.Packet;
-import org.xmpp.packet.Presence;
-import org.xmpp.packet.IQ.Type;
 import org.xmpp.packet.PacketError.Condition;
+import org.xmpp.packet.Presence;
 import org.xmpp.util.XMPPConstants;
 
 /**
@@ -118,17 +118,18 @@ public abstract class AbstractComponent implements Component {
 	 * @see <a href="http://xmpp.org/extensions/xep-0202.html">XEP-0202</a>
 	 */
 	public static final String NAMESPACE_ENTITY_TIME = "urn:xmpp:time";
-	
+
 	/**
 	 * The component manager to which this Component has been registered.
 	 */
 	protected ComponentManager compMan = null;
 
 	/**
-	 * The JID of the component, set after registration with a Component manager.
+	 * The JID of the component, set after registration with a Component
+	 * manager.
 	 */
 	protected JID jid = null;
-	
+
 	/**
 	 * The pool of threads that will process the queue.
 	 */
@@ -152,10 +153,10 @@ public abstract class AbstractComponent implements Component {
 	private final boolean enforceIQResult;
 
 	/**
-	 * The timestamp (in milliseconds) when the component was last (re)started. 
+	 * The timestamp (in milliseconds) when the component was last (re)started.
 	 */
 	private long lastStartMillis = System.currentTimeMillis();
-	
+
 	/**
 	 * Instantiates a new AbstractComponent with a maximum thread pool size of
 	 * 17 and a maximum queue size of 1000.
@@ -178,9 +179,8 @@ public abstract class AbstractComponent implements Component {
 	 *            request that is received is answered, as specified by the XMPP
 	 *            specification.
 	 */
-	public AbstractComponent(int maxThreadpoolSize, int maxQueueSize,
-			boolean enforceIQResult) {
-		this.maxThreadPoolSize = maxThreadpoolSize;
+	public AbstractComponent(final int maxThreadpoolSize, final int maxQueueSize, final boolean enforceIQResult) {
+		maxThreadPoolSize = maxThreadpoolSize;
 		this.maxQueueSize = maxQueueSize;
 		this.enforceIQResult = enforceIQResult;
 	}
@@ -192,11 +192,10 @@ public abstract class AbstractComponent implements Component {
 	 *      org.xmpp.component.ComponentManager)
 	 */
 	@Override
-	public final void initialize(final JID jid, final ComponentManager componentManager)
-			throws ComponentException {
+	public final void initialize(final JID jid, final ComponentManager componentManager) throws ComponentException {
 		compMan = componentManager;
 		this.jid = jid;
-		
+
 		// start the executor service.
 		startExecutor();
 	}
@@ -207,18 +206,15 @@ public abstract class AbstractComponent implements Component {
 	@Override
 	final public void processPacket(final Packet packet) {
 		final Packet copy = packet.createCopy();
-		
+
 		if (executor == null) {
-			
+
 		}
 		try {
 			executor.execute(new PacketProcessor(copy));
-		} catch (RejectedExecutionException ex) {
-			log.error("(serving component '" + getName()
-					+ "') Unable to process packet! "
-					+ "Is the thread pool queue exhausted? "
-					+ "Packet dropped in component '" + getName()
-					+ "'. Packet that's dropped: " + packet.toXML(), ex);
+		} catch (final RejectedExecutionException ex) {
+			log.error("(serving component '" + getName() + "') Unable to process packet! " + "Is the thread pool queue exhausted? "
+					+ "Packet dropped in component '" + getName() + "'. Packet that's dropped: " + packet.toXML(), ex);
 			// If the original packet was an IQ request, we should return an
 			// error.
 			if (packet instanceof IQ && ((IQ) packet).isRequest()) {
@@ -275,8 +271,7 @@ public abstract class AbstractComponent implements Component {
 	 *            The IQ stanza that was received by this component.
 	 */
 	final private void processIQ(final IQ iq) {
-		log.debug("(serving component '{}') Processing IQ (packetId {}): {}",
-				new Object[] {getName(), iq.getID(), iq.toXML() });
+		log.debug("(serving component '{}') Processing IQ (packetId {}): {}", new Object[] { getName(), iq.getID(), iq.toXML() });
 
 		IQ response = null;
 		final Type type = iq.getType();
@@ -301,36 +296,23 @@ public abstract class AbstractComponent implements Component {
 				} else {
 					// responses MUST be of type 'result' or 'error'. Everything
 					// else is invalid.
-					if (!response.isResponse()) {
-						throw new IllegalStateException("Responses to IQ "
-								+ "of type <tt>get</tt> or <tt>set</tt> can "
-								+ "only be IQ stanza's of type <tt>error</tt> "
-								+ "or <tt>result</tt>. The response to this "
-								+ "packet was incorrect: " + iq.toXML()
-								+ ". The response was: " + response.toXML());
-					}
+					if (!response.isResponse())
+						throw new IllegalStateException("Responses to IQ " + "of type <tt>get</tt> or <tt>set</tt> can "
+								+ "only be IQ stanza's of type <tt>error</tt> " + "or <tt>result</tt>. The response to this " + "packet was incorrect: "
+								+ iq.toXML() + ". The response was: " + response.toXML());
 					// responses must have the same packet ID as the request
-					if (!requestID.equals(response.getID())) {
-						throw new IllegalStateException("The response to "
-								+ "an request IQ must have the same packet "
-								+ "ID. If this was done intentionally, "
-								+ "#send(Packet) should have been used "
-								+ "instead. The response to this packet "
-								+ "was incorrect: " + iq.toXML()
-								+ ". The response was: " + response.toXML());
-					}
-					log.debug("(serving component '{}') Responding to IQ (packetId {}) with: {}", new Object[] { getName(), iq.getID(), response.toXML() }); 
+					if (!requestID.equals(response.getID()))
+						throw new IllegalStateException("The response to " + "an request IQ must have the same packet "
+								+ "ID. If this was done intentionally, " + "#send(Packet) should have been used " + "instead. The response to this packet "
+								+ "was incorrect: " + iq.toXML() + ". The response was: " + response.toXML());
+					log.debug("(serving component '{}') Responding to IQ (packetId {}) with: {}", new Object[] { getName(), iq.getID(), response.toXML() });
 				}
 				break;
 
 			case result:
 				if (servesLocalUsersOnly() && !sentByLocalEntity(iq)) {
-					log.info("(serving component '{}') Dropping IQ "
-							+ "stanza sent by a user from another domain: {}",
-							getName(), iq.getFrom());
-					log.debug("(serving component '{}') Dropping IQ "
-							+ "stanza sent by a user from another domain: {}",
-							getName(), iq.toXML());
+					log.info("(serving component '{}') Dropping IQ " + "stanza sent by a user from another domain: {}", getName(), iq.getFrom());
+					log.debug("(serving component '{}') Dropping IQ " + "stanza sent by a user from another domain: {}", getName(), iq.toXML());
 					return;
 				}
 				handleIQResult(iq);
@@ -338,21 +320,15 @@ public abstract class AbstractComponent implements Component {
 
 			case error:
 				if (servesLocalUsersOnly() && !sentByLocalEntity(iq)) {
-					log.info("(serving component '{}') Dropping IQ "
-							+ "stanza sent by a user from another domain: {}",
-							getName(), iq.getFrom());
-					log.debug("(serving component '{}') Dropping IQ "
-							+ "stanza sent by a user from another domain: {}",
-							getName(), iq.toXML());
+					log.info("(serving component '{}') Dropping IQ " + "stanza sent by a user from another domain: {}", getName(), iq.getFrom());
+					log.debug("(serving component '{}') Dropping IQ " + "stanza sent by a user from another domain: {}", getName(), iq.toXML());
 					return;
 				}
 				handleIQError(iq);
 				break;
 			}
-		} catch (Exception ex) {
-			log.warn("(serving component '" + getName()
-					+ "') Unexpected exception while processing IQ stanza: "
-					+ iq.toXML(), ex);
+		} catch (final Exception ex) {
+			log.warn("(serving component '" + getName() + "') Unexpected exception while processing IQ stanza: " + iq.toXML(), ex);
 			if (iq.isRequest()) {
 				// if the received IQ stanza was a 'get' or 'set' request,
 				// return an error, as some kind of response MUST be sent back
@@ -376,16 +352,11 @@ public abstract class AbstractComponent implements Component {
 	 * @param message
 	 *            The message stanza to process.
 	 */
-	final private void processMessage(Message message) {
-		log.trace("(serving component '{}') Processing message stanza: {}",
-				getName(), message.toXML());
+	final private void processMessage(final Message message) {
+		log.trace("(serving component '{}') Processing message stanza: {}", getName(), message.toXML());
 		if (servesLocalUsersOnly() && !sentByLocalEntity(message)) {
-			log.info("(serving component '{}') Dropping message "
-					+ "stanza sent by a user from another domain: {}",
-					getName(), message.getFrom());
-			log.debug("(serving component '{}') Dropping message "
-					+ "stanza sent by a user from another domain: {}",
-					getName(), message.toXML());
+			log.info("(serving component '{}') Dropping message " + "stanza sent by a user from another domain: {}", getName(), message.getFrom());
+			log.debug("(serving component '{}') Dropping message " + "stanza sent by a user from another domain: {}", getName(), message.toXML());
 			return;
 		}
 		handleMessage(message);
@@ -400,16 +371,11 @@ public abstract class AbstractComponent implements Component {
 	 * @param message
 	 *            The presence stanza to process.
 	 */
-	final private void processPresence(Presence presence) {
-		log.trace("(serving component '{}') Processing presence stanza: {}",
-				getName(), presence.toXML());
+	final private void processPresence(final Presence presence) {
+		log.trace("(serving component '{}') Processing presence stanza: {}", getName(), presence.toXML());
 		if (servesLocalUsersOnly() && !sentByLocalEntity(presence)) {
-			log.info("(serving component '{}') Dropping presence "
-					+ "stanza sent by a user from another domain: {}",
-					getName(), presence.getFrom());
-			log.debug("(serving component '{}') Dropping presence "
-					+ "stanza sent by a user from another domain: {}",
-					getName(), presence.toXML());
+			log.info("(serving component '{}') Dropping presence " + "stanza sent by a user from another domain: {}", getName(), presence.getFrom());
+			log.debug("(serving component '{}') Dropping presence " + "stanza sent by a user from another domain: {}", getName(), presence.toXML());
 			return;
 		}
 		handlePresence(presence);
@@ -451,9 +417,8 @@ public abstract class AbstractComponent implements Component {
 	 * @return Response to the request, or null to indicate a
 	 *         'feature-not-implemented' error.
 	 */
-	final private IQ processIQRequest(IQ iq) throws Exception {
-		log.debug("(serving component '{}') Processing IQ "
-				+ "request (packetId {}).", getName(), iq.getID());
+	final private IQ processIQRequest(final IQ iq) throws Exception {
+		log.debug("(serving component '{}') Processing IQ " + "request (packetId {}).", getName(), iq.getID());
 
 		// IQ get (and set) stanza's MUST be replied to.
 		final Element childElement = iq.getChildElement();
@@ -462,9 +427,7 @@ public abstract class AbstractComponent implements Component {
 			namespace = childElement.getNamespaceURI();
 		}
 		if (namespace == null) {
-			log.debug("(serving component '{}') Invalid XMPP "
-					+ "- no child element or namespace in IQ "
-					+ "request (packetId {})", getName(), iq.getID());
+			log.debug("(serving component '{}') Invalid XMPP " + "- no child element or namespace in IQ " + "request (packetId {})", getName(), iq.getID());
 			// this isn't valid XMPP.
 			final IQ response = IQ.createResultIQ(iq);
 			response.setError(Condition.bad_request);
@@ -472,12 +435,8 @@ public abstract class AbstractComponent implements Component {
 		}
 		// check if this is a component for local users only.
 		if (servesLocalUsersOnly() && !sentByLocalEntity(iq)) {
-			log.info("(serving component '{}') Returning "
-					+ "'not-authorized' IQ error to a user from "
-					+ "another domain: {}", getName(), iq.getFrom());
-			log.debug("(serving component '{}') Returning "
-					+ "'not-authorized' IQ error to a user from "
-					+ "another domain: {}", getName(), iq.toXML());
+			log.info("(serving component '{}') Returning " + "'not-authorized' IQ error to a user from " + "another domain: {}", getName(), iq.getFrom());
+			log.debug("(serving component '{}') Returning " + "'not-authorized' IQ error to a user from " + "another domain: {}", getName(), iq.toXML());
 			final IQ error = IQ.createResultIQ(iq);
 			error.setError(Condition.not_authorized);
 			return error;
@@ -485,37 +444,25 @@ public abstract class AbstractComponent implements Component {
 		final Type type = iq.getType();
 		if (type == Type.get) {
 			if (NAMESPACE_DISCO_INFO.equals(namespace)) {
-				log.trace("(serving component '{}') "
-						+ "Calling #handleDiscoInfo() (packetId {}).",
-						getName(), iq.getID());
+				log.trace("(serving component '{}') " + "Calling #handleDiscoInfo() (packetId {}).", getName(), iq.getID());
 				return handleDiscoInfo(iq);
 			} else if (NAMESPACE_DISCO_ITEMS.equals(namespace)) {
-				log.trace("(serving component '{}') "
-						+ "Calling #handleDiscoItems() (packetId {}).",
-						getName(), iq.getID());
+				log.trace("(serving component '{}') " + "Calling #handleDiscoItems() (packetId {}).", getName(), iq.getID());
 				return handleDiscoItems(iq);
 			} else if (NAMESPACE_XMPP_PING.equals(namespace)) {
-				log.trace("(serving component '{}') "
-						+ "Calling #handlePing() (packetId {}).", getName(), iq
-						.getID());
+				log.trace("(serving component '{}') " + "Calling #handlePing() (packetId {}).", getName(), iq.getID());
 				return handlePing(iq);
 			} else if (NAMESPACE_LAST_ACTIVITY.equals(namespace)) {
-				log.trace("(serving component '{}') "
-						+ "Calling #handleLastActivity() (packetId {}).", getName(), iq
-						.getID());
+				log.trace("(serving component '{}') " + "Calling #handleLastActivity() (packetId {}).", getName(), iq.getID());
 				return handleLastActivity(iq);
 			} else if (NAMESPACE_ENTITY_TIME.equals(namespace)) {
-				log.trace("(serving component '{}') "
-						+ "Calling #handleEntityTime() (packetId {}).", getName(), iq
-						.getID());
+				log.trace("(serving component '{}') " + "Calling #handleEntityTime() (packetId {}).", getName(), iq.getID());
 				return handleEntityTime(iq);
-			} else {
+			} else
 				return handleIQGet(iq);
-			}
 		}
-		if (type == Type.set) {
+		if (type == Type.set)
 			return handleIQSet(iq);
-		}
 		// If by now we didn't do anything to the packet, we don't know what to
 		// do with this. Return error (as it is a SET or GET stanza, which MUST
 		// be replied to).
@@ -531,7 +478,7 @@ public abstract class AbstractComponent implements Component {
 	 *            The IQ stanza of type <tt>result</tt> that was received by
 	 *            this component.
 	 */
-	protected void handleIQResult(IQ iq) {
+	protected void handleIQResult(final IQ iq) {
 		// Doesn't do anything. Override this method to process IQ result
 		// stanzas.
 	}
@@ -545,11 +492,10 @@ public abstract class AbstractComponent implements Component {
 	 *            The IQ stanza of type <tt>error</tt> that was received by this
 	 *            component.
 	 */
-	protected void handleIQError(IQ iq) {
+	protected void handleIQError(final IQ iq) {
 		// Doesn't do anything. Override this method to process IQ error
 		// stanzas.
-		log.info("(serving component '{}') IQ stanza "
-				+ "of type <tt>error</tt> received: {}", getName(), iq.toXML());
+		log.info("(serving component '{}') IQ stanza " + "of type <tt>error</tt> received: {}", getName(), iq.toXML());
 	}
 
 	/**
@@ -575,7 +521,7 @@ public abstract class AbstractComponent implements Component {
 	 * @return the response the to request stanza, or <tt>null</tt> to indicate
 	 *         'feature-not-available'.
 	 */
-	protected IQ handleIQGet(IQ iq) throws Exception {
+	protected IQ handleIQGet(final IQ iq) throws Exception {
 		// Doesn't do anything. Override this method to process IQ get
 		// stanzas.
 		return null;
@@ -604,7 +550,7 @@ public abstract class AbstractComponent implements Component {
 	 * @return the response the to request stanza, or <tt>null</tt> to indicate
 	 *         'feature-not-available'.
 	 */
-	protected IQ handleIQSet(IQ iq) throws Exception {
+	protected IQ handleIQSet(final IQ iq) throws Exception {
 		// Doesn't do anything. Override this method to process IQ set
 		// stanzas.
 		return null;
@@ -620,7 +566,7 @@ public abstract class AbstractComponent implements Component {
 	 *            The Service Discovery Items
 	 * @return Service Discovery Items response.
 	 */
-	protected IQ handleDiscoItems(IQ iq) {
+	protected IQ handleDiscoItems(final IQ iq) {
 		return null;
 	}
 
@@ -653,25 +599,18 @@ public abstract class AbstractComponent implements Component {
 	 *            The Service Discovery 'info' request stanza.
 	 * @return A response to the received Service Discovery 'info' request.
 	 */
-	protected IQ handleDiscoInfo(IQ iq) {
+	protected IQ handleDiscoInfo(final IQ iq) {
 		final IQ replyPacket = IQ.createResultIQ(iq);
-		final Element responseElement = replyPacket.setChildElement("query",
-				NAMESPACE_DISCO_INFO);
+		final Element responseElement = replyPacket.setChildElement("query", NAMESPACE_DISCO_INFO);
 
 		// identity
-		responseElement.addElement("identity").addAttribute("category",
-				discoInfoIdentityCategory()).addAttribute("type",
-				discoInfoIdentityCategoryType())
+		responseElement.addElement("identity").addAttribute("category", discoInfoIdentityCategory()).addAttribute("type", discoInfoIdentityCategoryType())
 				.addAttribute("name", getName());
 		// features
-		responseElement.addElement("feature").addAttribute("var",
-				NAMESPACE_DISCO_INFO);
-		responseElement.addElement("feature").addAttribute("var",
-				NAMESPACE_XMPP_PING);
-		responseElement.addElement("feature").addAttribute("var",
-				NAMESPACE_LAST_ACTIVITY);
-		responseElement.addElement("feature").addAttribute("var",
-				NAMESPACE_ENTITY_TIME);
+		responseElement.addElement("feature").addAttribute("var", NAMESPACE_DISCO_INFO);
+		responseElement.addElement("feature").addAttribute("var", NAMESPACE_XMPP_PING);
+		responseElement.addElement("feature").addAttribute("var", NAMESPACE_LAST_ACTIVITY);
+		responseElement.addElement("feature").addAttribute("var", NAMESPACE_ENTITY_TIME);
 		for (final String feature : discoInfoFeatureNamespaces()) {
 			responseElement.addElement("feature").addAttribute("var", feature);
 		}
@@ -687,25 +626,24 @@ public abstract class AbstractComponent implements Component {
 	 *            The Ping request stanza.
 	 * @return The XMPP way of saying 'pong'.
 	 */
-	protected IQ handlePing(IQ iq) {
+	protected IQ handlePing(final IQ iq) {
 		return IQ.createResultIQ(iq);
 	}
-	
+
 	/**
 	 * Default handler of Last Activity requests (XEP-0012). Unless overridden,
 	 * this method returns a result stanza that specifies how long this
 	 * component has been running since it was last (re)started.
 	 * 
 	 * @param iq
-	 *            The Last Activity request stanza. 
+	 *            The Last Activity request stanza.
 	 * @return Last Activity response that reports back the uptime of this
 	 *         component.
 	 */
-	protected IQ handleLastActivity(IQ iq) {
+	protected IQ handleLastActivity(final IQ iq) {
 		final long uptime = (System.currentTimeMillis() - lastStartMillis) / 1000;
 		final IQ result = IQ.createResultIQ(iq);
-		result.setChildElement("query", NAMESPACE_LAST_ACTIVITY).addAttribute(
-				"seconds", Long.toString(uptime));
+		result.setChildElement("query", NAMESPACE_LAST_ACTIVITY).addAttribute("seconds", Long.toString(uptime));
 		return result;
 	}
 
@@ -717,7 +655,7 @@ public abstract class AbstractComponent implements Component {
 	 *            Entity Time request stanza.
 	 * @return Result stanza including the local current time.
 	 */
-	protected IQ handleEntityTime(IQ iq) {
+	protected IQ handleEntityTime(final IQ iq) {
 		final Date now = new Date();
 		final SimpleDateFormat sdf = new SimpleDateFormat(XMPPConstants.XMPP_DATETIME_FORMAT);
 		final SimpleDateFormat sdf_timezone = new SimpleDateFormat("Z");
@@ -725,14 +663,14 @@ public abstract class AbstractComponent implements Component {
 		final String utc = sdf.format(now);
 		final String tz = sdf_timezone.format(new Date());
 		final String tzo = new StringBuilder(tz).insert(3, ':').toString();
-		
+
 		final IQ result = IQ.createResultIQ(iq);
 		final Element el = result.setChildElement("time", NAMESPACE_ENTITY_TIME);
 		el.addElement("tzo").setText(tzo);
 		el.addElement("utc").setText(utc);
 		return result;
 	}
-	
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -754,7 +692,8 @@ public abstract class AbstractComponent implements Component {
 	 * address of this component should be a subdomain of the domain returned by
 	 * this method.
 	 * 
-	 * @return The XMPP domain name, or <tt>null</tt> if this component has not been initialized yet.
+	 * @return The XMPP domain name, or <tt>null</tt> if this component has not
+	 *         been initialized yet.
 	 */
 	public String getDomain() {
 		return jid != null ? jid.getDomain() : null;
@@ -898,15 +837,13 @@ public abstract class AbstractComponent implements Component {
 		executor.shutdown();
 		try {
 			if (!executor.awaitTermination(2, TimeUnit.SECONDS)) {
-				final List<Runnable> wasAwatingExecution = executor
-						.shutdownNow();
+				final List<Runnable> wasAwatingExecution = executor.shutdownNow();
 				for (final Runnable abortMe : wasAwatingExecution) {
 					final Packet packet = ((PacketProcessor) abortMe).packet;
 					if (packet instanceof IQ) {
 						final IQ iq = (IQ) packet;
 						if (iq.isRequest()) {
-							log.debug("Responding 'service unavailable' to "
-									+ "unprocessed stanza: {}", iq.toXML());
+							log.debug("Responding 'service unavailable' to " + "unprocessed stanza: {}", iq.toXML());
 							final IQ error = IQ.createResultIQ(iq);
 							error.setError(Condition.service_unavailable);
 							send(error);
@@ -914,7 +851,7 @@ public abstract class AbstractComponent implements Component {
 					}
 				}
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// ignore, as we're shutting down anyway.
 		}
 	}
@@ -925,12 +862,11 @@ public abstract class AbstractComponent implements Component {
 	 * @param packet
 	 *            The packet to send.
 	 */
-	protected void send(Packet packet) {
+	protected void send(final Packet packet) {
 		try {
 			compMan.sendPacket(this, packet);
-		} catch (ComponentException e) {
-			log.warn("(serving component '" + getName()
-					+ "') Could not send packet!", e);
+		} catch (final ComponentException e) {
+			log.warn("(serving component '" + getName() + "') Could not send packet!", e);
 		}
 	}
 
@@ -966,21 +902,19 @@ public abstract class AbstractComponent implements Component {
 
 		// reset the 'last activity' timestamp.
 		lastStartMillis = System.currentTimeMillis();
-		
+
 		// start the executor service.
 		startExecutor();
-		
+
 		postComponentStart();
 	}
 
 	private void startExecutor() {
 		if (executor == null || executor.isShutdown()) {
-			executor = new ThreadPoolExecutor(maxThreadPoolSize,
-					maxThreadPoolSize, 60L, TimeUnit.SECONDS,
-					new LinkedBlockingQueue<Runnable>(maxQueueSize));
+			executor = new ThreadPoolExecutor(maxThreadPoolSize, maxThreadPoolSize, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(maxQueueSize));
 		}
 	}
-	
+
 	/**
 	 * This method gets called as part of the Component 'start' routine. This
 	 * method gets called before the other 'start' methods get executed. This
@@ -1018,12 +952,10 @@ public abstract class AbstractComponent implements Component {
 	 */
 	private boolean sentByLocalEntity(final Packet packet) {
 		final JID from = packet.getFrom();
-		if (from == null) {
+		if (from == null)
 			return true;
-		}
 		final String domain = from.getDomain();
-		return (domain.equals(getDomain()) || domain
-				.endsWith("." + getDomain()));
+		return domain.equals(getDomain()) || domain.endsWith("." + getDomain());
 	}
 
 	/**

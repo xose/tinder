@@ -63,7 +63,7 @@ public class DummyAbstractComponent extends AbstractComponent {
 	 * @see org.xmpp.component.AbstractComponent#send(org.xmpp.packet.Packet)
 	 */
 	@Override
-	protected void send(Packet packet) {
+	protected void send(final Packet packet) {
 		queue.add(packet);
 	}
 

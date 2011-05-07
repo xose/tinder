@@ -21,17 +21,17 @@ package org.xmpp.util.stringprep;
 
 /**
  * @author Gerolf Seitz (gseitz@apache.org)
- *
+ * 
  */
 public class StringPrepViolationException extends Exception {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public StringPrepViolationException() {
-    }
+	public StringPrepViolationException() {
+	}
 
-    public StringPrepViolationException(String message) {
-        super(message);
-    }
+	public StringPrepViolationException(final String message) {
+		super(message);
+	}
 
 }

@@ -45,8 +45,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new DummyAbstractComponent();
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping",
-				AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
 		pingRequest.setFrom("from.address");
 		pingRequest.setTo("to.address");
 
@@ -64,11 +63,11 @@ public class AbstractComponentRespondsToIQRequestsTest {
 	}
 
 	/**
-	 * If no implementation is provided for a particular IQ request, a response (an error) should be returned.
+	 * If no implementation is provided for a particular IQ request, a response
+	 * (an error) should be returned.
 	 */
 	@Test
-	public void testNoImplementation() throws Exception
-	{
+	public void testNoImplementation() throws Exception {
 		// setup
 		final DummyAbstractComponent component = new DummyAbstractComponent();
 		final IQ request = new IQ(Type.set);
@@ -86,9 +85,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		assertTrue(result.isResponse());
 		assertEquals(request.getID(), result.getID());
 		assertEquals(request.getFrom(), result.getTo());
-		assertEquals(request.getTo(), result.getFrom());		
+		assertEquals(request.getTo(), result.getFrom());
 	}
-	
+
 	/**
 	 * If an exception is thrown during the processing of an IQ request,
 	 * AbstractComponent should still return a response to the request.
@@ -155,9 +154,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new SlowRespondingThreadNameComponent();
 		final IQ request = new IQ();
-		request.setChildElement(
-				SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE,
-				SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 		request.setFrom("from.address");
 		request.setTo("to.address");
 
@@ -189,9 +186,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new SlowRespondingThreadNameComponent();
 		final IQ request = new IQ();
-		request.setChildElement(
-				SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE,
-				SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 		request.setFrom("from.address");
 		request.setTo("to.address");
 
@@ -228,9 +223,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// that we can queue enough requests to cause an overflow of the queue.
 		for (int i = 1; i <= 17; i++) {
 			final IQ request = new IQ();
-			request.setChildElement(
-					SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE,
-					SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+			request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 			request.setFrom("from.address");
 			request.setTo("to.address");
 			request.setID("slow" + i);
@@ -241,9 +234,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// overflow.
 		for (int i = 1; i <= 1001; i++) {
 			final IQ request = new IQ();
-			request.setChildElement(
-					SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME,
-					SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+			request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 			request.setFrom("from.address");
 			request.setTo("to.address");
 			request.setID("thread" + i);
@@ -252,7 +243,7 @@ public class AbstractComponentRespondsToIQRequestsTest {
 
 		// do magic
 		component.start();
-		for (IQ request : requests) {
+		for (final IQ request : requests) {
 			component.processPacket(request);
 		}
 		Thread.sleep(4000);
