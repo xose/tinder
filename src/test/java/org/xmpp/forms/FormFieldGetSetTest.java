@@ -17,6 +17,7 @@
 package org.xmpp.forms;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -157,14 +158,11 @@ public class FormFieldGetSetTest {
 	 */
 	@Test
 	public void testRequired_true() {
-		// setup
-		final boolean required = true;
-
 		// do magic
-		field.setRequired(required);
+		field.setRequired(true);
 
 		// verify
-		assertEquals(required, field.isRequired());
+		assertTrue(field.isRequired());
 	}
 
 	/**
@@ -173,14 +171,11 @@ public class FormFieldGetSetTest {
 	 */
 	@Test
 	public void testRequired_false() {
-		// setup
-		final boolean required = false;
-
 		// do magic
-		field.setRequired(required);
+		field.setRequired(false);
 
 		// verify
-		assertEquals(required, field.isRequired());
+		assertFalse(field.isRequired());
 	}
 
 	/**
