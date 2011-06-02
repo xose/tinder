@@ -18,7 +18,7 @@ package org.xmpp.muc;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Message;
 
@@ -57,11 +57,12 @@ public class Invitation extends Message {
 	 */
 	public Invitation(final JID invitee, final String reason) {
 		super();
-		final Element element = addChildElement("x", "http://jabber.org/protocol/muc#user");
-		final Element invite = element.addElement("invite");
-		invite.addAttribute("to", invitee.toString());
-		if (reason != null && reason.length() > 0) {
-			invite.addElement("reason").setText(reason);
+		final Element child = addChildElement(element, "x", "http://jabber.org/protocol/muc#user");
+		final Element invite = addChildElement(child, "invite");
+
+		invite.setAttribute("to", invitee.toString());
+		if (reason != null && !reason.isEmpty()) {
+			addChildElement(invite, "reason").setTextContent(reason);
 		}
 	}
 }

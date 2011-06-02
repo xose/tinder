@@ -22,7 +22,7 @@ import java.util.Map.Entry;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 
 /**
@@ -63,21 +63,25 @@ public class RoomConfiguration extends IQ {
 	 *            the list of fields associated with the list of values.
 	 */
 	public RoomConfiguration(final Map<String, Collection<String>> fieldValues) {
-		super();
-		setType(Type.set);
-		final Element query = setChildElement("query", "http://jabber.org/protocol/muc#owner");
-		final Element form = query.addElement("x", "jabber:x:data");
-		form.addAttribute("type", "submit");
+		super(Type.set);
+
+		final Element query = setIQChildElement("query", "http://jabber.org/protocol/muc#owner");
+		final Element form = addChildElement(query, "x", "jabber:x:data");
+		form.setAttribute("type", "submit");
+
+		// TODO: use XMPP Forms
+
 		// Add static field
-		Element field = form.addElement("field");
-		field.addAttribute("var", "FORM_TYPE");
-		field.addElement("value").setText("http://jabber.org/protocol/muc#roomconfig");
+		Element field = addChildElement(form, "field");
+		field.setAttribute("var", "FORM_TYPE");
+		addChildElement(field, "value").setTextContent("http://jabber.org/protocol/muc#roomconfig");
+
 		// Add the specified fields and their corresponding values
 		for (final Entry<String, Collection<String>> entry : fieldValues.entrySet()) {
-			field = form.addElement("field");
-			field.addAttribute("var", entry.getKey());
+			field = addChildElement(form, "field");
+			field.setAttribute("var", entry.getKey());
 			for (final String value : entry.getValue()) {
-				field.addElement("value").setText(value);
+				addChildElement(field, "value").setTextContent(value);
 			}
 		}
 	}

@@ -28,11 +28,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
+import javax.xml.namespace.QName;
+
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
 import org.jivesoftware.util.FastDateFormat;
+import org.w3c.dom.Element;
 import org.xmpp.packet.PacketExtension;
 import org.xmpp.util.XMPPConstants;
 
@@ -77,7 +78,7 @@ public class DataForm extends PacketExtension {
 	static {
 		UTC_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
 		// Register that DataForms uses the jabber:x:data namespace
-		registeredExtensions.put(QName.get(ELEMENT_NAME, NAMESPACE), DataForm.class);
+		registeredExtensions.put(new QName(NAMESPACE, ELEMENT_NAME), DataForm.class);
 	}
 
 	/**

@@ -18,8 +18,6 @@ package org.xmpp.packet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,14 +39,7 @@ public class PacketAddressingTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		final Element element = DocumentFactory.getInstance().createElement("packet");
-		packet = new Packet(element) {
-
-			@Override
-			public Packet createCopy() {
-				return null;
-			}
-		};
+		packet = new Packet("packet");
 	}
 
 	/**
@@ -56,19 +47,9 @@ public class PacketAddressingTest {
 	 */
 	@Test
 	public void testAllowNullToJID() throws Exception {
-		packet.setTo((JID) null);
+		packet.setTo(null);
 		assertNull(packet.getTo());
-		assertNull(packet.getElement().attributeValue("to"));
-	}
-
-	/**
-	 * To and From addresses should be allowed to be <tt>null</tt>.
-	 */
-	@Test
-	public void testAllowNullToString() throws Exception {
-		packet.setTo((String) null);
-		assertNull(packet.getTo());
-		assertNull(packet.getElement().attributeValue("to"));
+		assertNull(packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -84,23 +65,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getTo());
-		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("to"));
-	}
-
-	/**
-	 * Verifies that using a String value works as expected.
-	 */
-	@Test
-	public void testAllowToString() throws Exception {
-		// setup
-		final String string = "test@example.org/junit";
-
-		// do magic
-		packet.setTo(string);
-
-		// verify
-		assertEquals(string, packet.getTo().toFullJID());
-		assertEquals(string, packet.getElement().attributeValue("to"));
+		assertEquals(jid.toFullJID(), packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -118,24 +83,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getTo());
-		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("to"));
-	}
-
-	/**
-	 * Verifies that setting an address twice causes the last value to be used.
-	 */
-	@Test
-	public void testCanResetNullStringTo() throws Exception {
-		// setup
-		final JID orig = new JID("test", "example.org", "junit");
-		packet.setTo(orig);
-
-		// do magic
-		packet.setTo((String) null);
-
-		// verify
-		assertNull(packet.getTo());
-		assertNull(packet.getElement().attributeValue("to"));
+		assertEquals(jid.toFullJID(), packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -152,7 +100,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertNull(packet.getTo());
-		assertNull(packet.getElement().attributeValue("to"));
+		assertNull(packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -162,17 +110,7 @@ public class PacketAddressingTest {
 	public void testAllowNullFromJID() throws Exception {
 		packet.setFrom((JID) null);
 		assertNull(packet.getFrom());
-		assertNull(packet.getElement().attributeValue("from"));
-	}
-
-	/**
-	 * To and From addresses should be allowed to be <tt>null</tt>.
-	 */
-	@Test
-	public void testAllowNullFromString() throws Exception {
-		packet.setFrom((String) null);
-		assertNull(packet.getFrom());
-		assertNull(packet.getElement().attributeValue("from"));
+		assertNull(packet.getElement().getAttribute("from"));
 	}
 
 	/**
@@ -188,23 +126,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getFrom());
-		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("from"));
-	}
-
-	/**
-	 * Verifies that using a String value works as expected.
-	 */
-	@Test
-	public void testAllowFromString() throws Exception {
-		// setup
-		final String string = "test@example.org/junit";
-
-		// do magic
-		packet.setFrom(string);
-
-		// verify
-		assertEquals(string, packet.getFrom().toFullJID());
-		assertEquals(string, packet.getElement().attributeValue("from"));
+		assertEquals(jid.toFullJID(), packet.getElement().getAttribute("from"));
 	}
 
 	/**
@@ -222,24 +144,7 @@ public class PacketAddressingTest {
 
 		// verify
 		assertEquals(jid, packet.getFrom());
-		assertEquals(jid.toFullJID(), packet.getElement().attributeValue("from"));
-	}
-
-	/**
-	 * Verifies that setting an address twice causes the last value to be used.
-	 */
-	@Test
-	public void testCanResetNullStringFrom() throws Exception {
-		// setup
-		final JID orig = new JID("test", "example.org", "junit");
-		packet.setFrom(orig);
-
-		// do magic
-		packet.setFrom((String) null);
-
-		// verify
-		assertNull(packet.getFrom());
-		assertNull(packet.getElement().attributeValue("from"));
+		assertEquals(jid.toFullJID(), packet.getElement().getAttribute("from"));
 	}
 
 	/**
@@ -256,6 +161,6 @@ public class PacketAddressingTest {
 
 		// verify
 		assertNull(packet.getFrom());
-		assertNull(packet.getElement().attributeValue("from"));
+		assertNull(packet.getElement().getAttribute("from"));
 	}
 }

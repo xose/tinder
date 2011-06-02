@@ -51,9 +51,6 @@ public class LeaveRoom extends Presence {
 	 *            the user as a resource.
 	 */
 	public LeaveRoom(final JID from, final JID to) {
-		super();
-		setFrom(from);
-		setTo(to);
-		setType(Type.unavailable);
+		super(Presence.Type.unavailable, from, to);
 	}
 }

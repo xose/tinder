@@ -21,11 +21,10 @@ import static org.junit.Assert.fail;
 
 import java.util.Iterator;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 
@@ -55,7 +54,7 @@ public class AbstractComponentServiceDiscovery {
 	public void setUp() throws Exception {
 		final IQ request = new IQ();
 		request.setType(Type.get);
-		request.setChildElement("query", DISCOINFONS);
+		request.setIQChildElement("query", DISCOINFONS);
 		comp.start();
 		comp.processPacket(request);
 		response = (IQ) comp.getSentPacket();
@@ -78,17 +77,15 @@ public class AbstractComponentServiceDiscovery {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("identity");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute category = element.attribute("category");
-			if (category == null || category.getValue() != "component") {
+			if (element.getAttribute("category") != "component") {
 				continue;
 			}
 
-			final Attribute name = element.attribute("name");
-			if (name != null && name.getValue() == comp.getName())
+			if (element.getAttribute("name") == comp.getName())
 				// succes!
 				return;
 		}
@@ -106,12 +103,11 @@ public class AbstractComponentServiceDiscovery {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("feature");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute attr = element.attribute("var");
-			if (attr != null && attr.getValue() == DISCOINFONS)
+			if (element.getAttribute("var") == DISCOINFONS)
 				// succes!
 				return;
 		}
@@ -129,12 +125,11 @@ public class AbstractComponentServiceDiscovery {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("feature");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute attr = element.attribute("var");
-			if (attr != null && attr.getValue() == "urn:xmpp:ping")
+			if (element.getAttribute("var") == "urn:xmpp:ping")
 				// succes!
 				return;
 		}
@@ -152,12 +147,11 @@ public class AbstractComponentServiceDiscovery {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("feature");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute attr = element.attribute("var");
-			if (attr != null && attr.getValue() == "jabber:iq:last")
+			if (element.getAttribute("var") == "jabber:iq:last")
 				// succes!
 				return;
 		}
@@ -175,12 +169,11 @@ public class AbstractComponentServiceDiscovery {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("feature");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute attr = element.attribute("var");
-			if (attr != null && attr.getValue() == "urn:xmpp:time")
+			if (element.getAttribute("var") == "urn:xmpp:time")
 				// succes!
 				return;
 		}
@@ -211,7 +204,7 @@ public class AbstractComponentServiceDiscovery {
 		// do magic
 		final IQ request = new IQ();
 		request.setType(Type.get);
-		request.setChildElement("query", DISCOINFONS);
+		request.setIQChildElement("query", DISCOINFONS);
 		component.start();
 		component.processPacket(request);
 		response = (IQ) component.getSentPacket();
@@ -220,14 +213,13 @@ public class AbstractComponentServiceDiscovery {
 		boolean has1 = false;
 		boolean has2 = false;
 
-		final Element childElement = response.getChildElement();
+		final Element childElement = response.getIQChildElement();
 		final Iterator<Element> iter = childElement.elementIterator("feature");
 		while (iter.hasNext()) {
 			final Element element = iter.next();
-			final Attribute attr = element.attribute("var");
-			if (attr != null && attr.getValue() == ns1) {
+			if (element.getAttribute("var") == ns1) {
 				has1 = true;
-			} else if (attr != null && attr.getValue() == ns2) {
+			} else if (element.getAttribute("var") == ns2) {
 				has2 = true;
 			}
 		}

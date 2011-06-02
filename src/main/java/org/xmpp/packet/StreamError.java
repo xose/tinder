@@ -16,16 +16,12 @@
 
 package org.xmpp.packet;
 
-import java.io.StringWriter;
 import java.util.Iterator;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
+import org.w3c.dom.Element;
+import org.xmpp.util.BaseXML;
 
 /**
  * A stream error. Stream errors have a condition and they can optionally
@@ -34,13 +30,9 @@ import org.dom4j.io.XMLWriter;
  * @author Matt Tucker
  */
 @NotThreadSafe
-public class StreamError {
+public class StreamError extends BaseXML {
 
 	private static final String ERROR_NAMESPACE = "urn:ietf:params:xml:ns:xmpp-streams";
-
-	private static DocumentFactory docFactory = DocumentFactory.getInstance();
-
-	private final Element element;
 
 	/**
 	 * Construcs a new StreamError with the specified condition.
@@ -49,7 +41,7 @@ public class StreamError {
 	 *            the error condition.
 	 */
 	public StreamError(final Condition condition) {
-		element = docFactory.createElement(docFactory.createQName("error", "stream", "http://etherx.jabber.org/streams"));
+		super("error:stream", "http://etherx.jabber.org/streams");
 		setCondition(condition);
 	}
 
@@ -62,8 +54,7 @@ public class StreamError {
 	 *            the text description of the error.
 	 */
 	public StreamError(final Condition condition, final String text) {
-		element = docFactory.createElement(docFactory.createQName("error", "stream", "http://etherx.jabber.org/streams"));
-		setCondition(condition);
+		this(condition);
 		setText(text, null);
 	}
 
@@ -78,8 +69,7 @@ public class StreamError {
 	 *            the language code of the error description (e.g. "en").
 	 */
 	public StreamError(final Condition condition, final String text, final String language) {
-		element = docFactory.createElement(docFactory.createQName("error", "stream", "http://etherx.jabber.org/streams"));
-		setCondition(condition);
+		this(condition);
 		setText(text, language);
 	}
 
@@ -91,7 +81,7 @@ public class StreamError {
 	 *            the stream error Element.
 	 */
 	public StreamError(final Element element) {
-		this.element = element;
+		super(element);
 	}
 
 	/**
@@ -143,7 +133,7 @@ public class StreamError {
 	 * @return the text description of the error.
 	 */
 	public String getText() {
-		return element.elementText("text");
+		return getChildElementText(element, "text");
 	}
 
 	/**
@@ -197,38 +187,6 @@ public class StreamError {
 		if (textElement != null)
 			return textElement.attributeValue(QName.get("lang", "xml", "http://www.w3.org/XML/1998/namespace"));
 		return null;
-	}
-
-	/**
-	 * Returns the DOM4J Element that backs the error. The element is the
-	 * definitive representation of the error and can be manipulated directly to
-	 * change error contents.
-	 * 
-	 * @return the DOM4J Element.
-	 */
-	public Element getElement() {
-		return element;
-	}
-
-	/**
-	 * Returns the textual XML representation of this stream error.
-	 * 
-	 * @return the textual XML representation of this stream error.
-	 */
-	public String toXML() {
-		return element.asXML();
-	}
-
-	@Override
-	public String toString() {
-		final StringWriter out = new StringWriter();
-		final XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
-		try {
-			writer.write(element);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-		return out.toString();
 	}
 
 	/**

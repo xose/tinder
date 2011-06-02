@@ -52,9 +52,8 @@ public class JoinRoom extends Presence {
 	 *            resource is the nickname of the user joining the room.
 	 */
 	public JoinRoom(final JID from, final JID to) {
-		super();
-		setFrom(from);
-		setTo(to);
-		addChildElement("x", "http://jabber.org/protocol/muc");
+		super(Presence.Type.available, from, to);
+
+		addChildElement(element, "x", "http://jabber.org/protocol/muc");
 	}
 }

@@ -18,7 +18,7 @@ package org.xmpp.muc;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.JID;
 
@@ -47,15 +47,17 @@ public class DestroyRoom extends IQ {
 	 *            reason for the destruction or <tt>null</tt> if none.
 	 */
 	public DestroyRoom(final JID alternateJID, final String reason) {
-		super();
-		setType(Type.set);
-		final Element query = setChildElement("query", "http://jabber.org/protocol/muc#owner");
-		final Element destroy = query.addElement("destroy");
+		super(Type.set);
+
+		final Element query = setIQChildElement("query", "http://jabber.org/protocol/muc#owner");
+		final Element destroy = addChildElement(query, "destroy");
+
 		if (alternateJID != null) {
-			destroy.addAttribute("jid", alternateJID.toString());
+			destroy.setAttribute("jid", alternateJID.toString());
 		}
+
 		if (reason != null) {
-			destroy.addElement("reason").setText(reason);
+			addChildElement(destroy, "reason").setTextContent(reason);
 		}
 	}
 }

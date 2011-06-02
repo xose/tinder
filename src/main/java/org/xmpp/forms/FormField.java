@@ -22,7 +22,7 @@ import java.util.List;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 
 /**
  * Represents a field of a form. The field could be used to represent a question
@@ -36,7 +36,7 @@ public class FormField {
 
 	private final Element element;
 
-	FormField(final Element element) {
+	private FormField(final Element element) {
 		this.element = element;
 	}
 

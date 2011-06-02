@@ -91,8 +91,8 @@ public class DataFormAddingFieldsTest {
 		field = form.getField(var);
 		if (field == null || !var.equals(field.getVariable())) {
 			fail("Can't add a complete field into a Data Form.");
-		}
-		if (!LABEL.equals(field.getLabel()) || !FIELD_TYPE.equals(field.getType()) || field.getValues().size() != 1 || !VALUE.equals(field.getFirstValue())) {
+		} else if (!LABEL.equals(field.getLabel()) || !FIELD_TYPE.equals(field.getType()) || field.getValues().size() != 1
+				|| !VALUE.equals(field.getFirstValue())) {
 			fail("Any paramameter wasn't applied correctly.");
 		}
 	}

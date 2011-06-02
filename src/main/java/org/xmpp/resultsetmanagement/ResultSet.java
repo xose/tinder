@@ -23,9 +23,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.w3c.dom.Element;
 
 /**
  * A result set representation as described in XEP-0059. A result set is a

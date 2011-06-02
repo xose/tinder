@@ -19,10 +19,10 @@ package org.xmpp.component;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.dom4j.Element;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 
@@ -74,15 +74,15 @@ public class AbstractComponentIsConsumerTest {
 		// setup
 		final String producerThreadName = Thread.currentThread().getName();
 		final IQ request = new IQ(Type.get);
-		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 
 		// do magic
 		debugComp.processPacket(request);
 		final IQ response = (IQ) debugComp.getSentPacket();
 
 		// verify
-		final Element elem = response.getChildElement();
-		final String consumerThreadName = elem.getText();
+		final Element elem = response.getIQChildElement();
+		final String consumerThreadName = elem.getTextContent();
 		assertFalse(consumerThreadName.equals(producerThreadName));
 	}
 
@@ -99,7 +99,7 @@ public class AbstractComponentIsConsumerTest {
 	public void consumesAsynchronouslyTest() throws Exception {
 		// setup
 		final IQ request = new IQ(Type.get);
-		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
 
 		// do magic
 		final long start = System.currentTimeMillis();

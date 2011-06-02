@@ -25,6 +25,7 @@ import java.util.List;
 import org.junit.Test;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
+import org.xmpp.packet.JID;
 
 /**
  * The XMPP specification states that every IQ request should be responded to.
@@ -45,9 +46,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new DummyAbstractComponent();
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("from.address");
-		pingRequest.setTo("to.address");
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("from.address"));
+		pingRequest.setTo(new JID("to.address"));
 
 		// do magic
 		component.start();
@@ -71,9 +72,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new DummyAbstractComponent();
 		final IQ request = new IQ(Type.set);
-		request.setChildElement("junit", "test");
-		request.setFrom("from.address");
-		request.setTo("to.address");
+		request.setIQChildElement("junit", "test");
+		request.setFrom(new JID("from.address"));
+		request.setTo(new JID("to.address"));
 
 		// do magic
 		component.start();
@@ -100,9 +101,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new ThrowExceptionOnGetComponent();
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("junit", "test");
-		request.setFrom("from.address");
-		request.setTo("to.address");
+		request.setIQChildElement("junit", "test");
+		request.setFrom(new JID("from.address"));
+		request.setTo(new JID("to.address"));
 
 		// do magic
 		component.start();
@@ -154,9 +155,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new SlowRespondingThreadNameComponent();
 		final IQ request = new IQ();
-		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
-		request.setFrom("from.address");
-		request.setTo("to.address");
+		request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setFrom(new JID("from.address"));
+		request.setTo(new JID("to.address"));
 
 		// do magic
 		component.start();
@@ -186,9 +187,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// setup
 		final DummyAbstractComponent component = new SlowRespondingThreadNameComponent();
 		final IQ request = new IQ();
-		request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
-		request.setFrom("from.address");
-		request.setTo("to.address");
+		request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+		request.setFrom(new JID("from.address"));
+		request.setTo(new JID("to.address"));
 
 		// do magic
 		component.start();
@@ -223,9 +224,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// that we can queue enough requests to cause an overflow of the queue.
 		for (int i = 1; i <= 17; i++) {
 			final IQ request = new IQ();
-			request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
-			request.setFrom("from.address");
-			request.setTo("to.address");
+			request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_SLOWRESPONSE, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+			request.setFrom(new JID("from.address"));
+			request.setTo(new JID("to.address"));
 			request.setID("slow" + i);
 			requests.add(request);
 		}
@@ -234,9 +235,9 @@ public class AbstractComponentRespondsToIQRequestsTest {
 		// overflow.
 		for (int i = 1; i <= 1001; i++) {
 			final IQ request = new IQ();
-			request.setChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
-			request.setFrom("from.address");
-			request.setTo("to.address");
+			request.setIQChildElement(SlowRespondingThreadNameComponent.ELEMENTNAME_THREADNAME, SlowRespondingThreadNameComponent.DEBUG_NAMESPACE);
+			request.setFrom(new JID("from.address"));
+			request.setTo(new JID("to.address"));
 			request.setID("thread" + i);
 			requests.add(request);
 		}

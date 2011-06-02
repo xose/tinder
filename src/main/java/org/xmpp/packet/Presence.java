@@ -16,11 +16,9 @@
 
 package org.xmpp.packet;
 
-import java.util.Iterator;
-
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 
 /**
  * Presence packet. Presence packets are used to express an entity's current
@@ -40,7 +38,7 @@ public class Presence extends Packet {
 	 * Constructs a new Presence.
 	 */
 	public Presence() {
-		element = docFactory.createDocument().addElement("presence");
+		super("presence");
 	}
 
 	/**
@@ -54,59 +52,10 @@ public class Presence extends Packet {
 		setType(type);
 	}
 
-	/**
-	 * Constructs a new Presence using an existing Element. This is useful for
-	 * parsing incoming presence Elements into Presence objects.
-	 * 
-	 * @param element
-	 *            the presence Element.
-	 */
-	public Presence(final Element element) {
-		super(element);
-	}
-
-	/**
-	 * Constructs a new Presence using an existing Element. This is useful for
-	 * parsing incoming Presence Elements into Presence objects. Stringprep
-	 * validation on the TO address can be disabled. The FROM address will not
-	 * be validated since the server is the one that sets that value.
-	 * 
-	 * @param element
-	 *            the Presence Element.
-	 * @param skipValidation
-	 *            true if stringprep should not be applied to the TO address.
-	 */
-	public Presence(final Element element, final boolean skipValidation) {
-		super(element, skipValidation);
-	}
-
-	/**
-	 * Constructs a new Presence that is a copy of an existing Presence.
-	 * 
-	 * @param presence
-	 *            the presence packet.
-	 * @see #createCopy()
-	 */
-	private Presence(final Presence presence) {
-		final Element elementCopy = presence.element.createCopy();
-		docFactory.createDocument().add(elementCopy);
-		element = elementCopy;
-		// Copy cached JIDs (for performance reasons)
-		toJID = presence.toJID;
-		fromJID = presence.fromJID;
-	}
-
-	/**
-	 * Returns true if the presence type is "available". This is a convenience
-	 * method that is equivalent to:
-	 * 
-	 * <pre>
-	 * getType() == null
-	 * </pre>
-	 * 
-	 */
-	public boolean isAvailable() {
-		return getType() == null;
+	public Presence(final Presence.Type type, final JID from, final JID to) {
+		this(type);
+		setFrom(from);
+		setTo(to);
 	}
 
 	/**
@@ -118,10 +67,12 @@ public class Presence extends Packet {
 	 * @see Type
 	 */
 	public Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return Type.valueOf(type);
-		return null;
+		final String type = element.getAttribute("type");
+
+		if (type == null)
+			return Type.available;
+
+		return Type.valueOf(type);
 	}
 
 	/**
@@ -132,7 +83,11 @@ public class Presence extends Packet {
 	 * @see Type
 	 */
 	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toString());
+		if (type == null || type == Type.available) {
+			element.removeAttribute("type");
+		} else {
+			element.setAttribute("type", type.toString());
+		}
 	}
 
 	/**
@@ -252,71 +207,6 @@ public class Presence extends Packet {
 	}
 
 	/**
-	 * Returns the first child element of this packet that matches the given
-	 * name and namespace. If no matching element is found, <tt>null</tt> will
-	 * be returned. This is a convenience method to avoid manipulating this
-	 * underlying packet's Element instance directly.
-	 * <p>
-	 * 
-	 * Child elements in extended namespaces are used to extend the features of
-	 * XMPP. Examples include a "user is typing" indicator and invitations to
-	 * group chat rooms. Although any valid XML can be included in a child
-	 * element in an extended namespace, many common features have been
-	 * standardized as <a href="http://xmpp.org/extensions/">XMPP Extension
-	 * Protocols</a> (XEPs).
-	 * 
-	 * @param name
-	 *            the element name.
-	 * @param namespace
-	 *            the element namespace.
-	 * @return the first matching child element, or <tt>null</tt> if there is no
-	 *         matching child element.
-	 */
-	@SuppressWarnings("unchecked")
-	public Element getChildElement(final String name, final String namespace) {
-		for (final Iterator<Element> i = element.elementIterator(name); i.hasNext();) {
-			final Element element = i.next();
-			if (element.getNamespaceURI().equals(namespace))
-				return element;
-		}
-		return null;
-	}
-
-	/**
-	 * Adds a new child element to this packet with the given name and
-	 * namespace. The newly created Element is returned. This is a convenience
-	 * method to avoid manipulating this underlying packet's Element instance
-	 * directly.
-	 * <p>
-	 * 
-	 * Child elements in extended namespaces are used to extend the features of
-	 * XMPP. Examples include a "user is typing" indicator and invitations to
-	 * group chat rooms. Although any valid XML can be included in a child
-	 * element in an extended namespace, many common features have been
-	 * standardized as <a href="http://xmpp.org/extensions/">XMPP Extension
-	 * Protocols</a> (XEPs).
-	 * 
-	 * @param name
-	 *            the element name.
-	 * @param namespace
-	 *            the element namespace.
-	 * @return the newly created child element.
-	 */
-	public Element addChildElement(final String name, final String namespace) {
-		return element.addElement(name, namespace);
-	}
-
-	/**
-	 * Returns a deep copy of this Presence.
-	 * 
-	 * @return a deep copy of this Presence.
-	 */
-	@Override
-	public Presence createCopy() {
-		return new Presence(this);
-	}
-
-	/**
 	 * Represents the type of a presence packet. Note: the presence is assumed
 	 * to be "available" when the type attribute of the packet is <tt>null</tt>.
 	 * The valid types are:
@@ -341,6 +231,11 @@ public class Presence extends Packet {
 	 * </ul>
 	 */
 	public enum Type {
+
+		/**
+		 * The sender is available.
+		 */
+		available,
 
 		/**
 		 * Typically short text message used in line-by-line chat interfaces.

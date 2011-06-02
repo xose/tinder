@@ -16,14 +16,18 @@
 
 package org.xmpp.packet;
 
+import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.xml.namespace.QName;
+
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.QName;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.xmpp.util.BaseXML;
 
 /**
  * A packet extension represents a child element of a Packet for a given
@@ -43,16 +47,15 @@ import org.dom4j.QName;
  * @author Gaston Dombiak
  */
 @NotThreadSafe
-public class PacketExtension {
+public class PacketExtension extends BaseXML {
 
-	protected static final DocumentFactory docFactory = DocumentFactory.getInstance();
+	private static final Logger log = LoggerFactory.getLogger(PacketExtension.class);
+
 	/**
 	 * Subclasses of PacketExtension should register the element name and
 	 * namespace that the subclass is using.
 	 */
 	protected static final Map<QName, Class<? extends PacketExtension>> registeredExtensions = new ConcurrentHashMap<QName, Class<? extends PacketExtension>>();
-
-	protected Element element;
 
 	/**
 	 * Returns the extension class to use for the specified element name and
@@ -66,8 +69,8 @@ public class PacketExtension {
 	 * @return the extension class to use for the specified element name and
 	 *         namespace.
 	 */
-	public static Class<? extends PacketExtension> getExtensionClass(final String name, final String namespace) {
-		return registeredExtensions.get(QName.get(name, namespace));
+	public static final Class<? extends PacketExtension> getExtensionClass(final String localName, final String namespaceURI) {
+		return registeredExtensions.get(new QName(namespaceURI, localName));
 	}
 
 	/**
@@ -78,8 +81,8 @@ public class PacketExtension {
 	 * @param namespace
 	 *            the child element namespace.
 	 */
-	public PacketExtension(final String name, final String namespace) {
-		element = docFactory.createDocument().addElement(name, namespace);
+	protected PacketExtension(final String qualifiedName, final String namespaceURI) {
+		super(qualifiedName, namespaceURI);
 	}
 
 	/**
@@ -88,29 +91,82 @@ public class PacketExtension {
 	 * @param element
 	 *            the XML Element that contains the packet extension contents.
 	 */
-	public PacketExtension(final Element element) {
-		this.element = element;
+	protected PacketExtension(final Element element) {
+		super(element);
 	}
 
 	/**
-	 * Returns the DOM4J Element that backs the packet. The element is the
-	 * definitive representation of the packet and can be manipulated directly
-	 * to change packet contents.
+	 * Adds the element contained in the PacketExtension to the element of this
+	 * packet. It is important that this is the first and last time the element
+	 * contained in PacketExtension is added to another Packet. Otherwise, a
+	 * runtime error will be thrown when trying to add the PacketExtension's
+	 * element to the Packet's element. Future modifications to the
+	 * PacketExtension will be reflected in this Packet.
 	 * 
-	 * @return the DOM4J Element that represents the packet.
+	 * @param extension
+	 *            the PacketExtension whose element will be added to this
+	 *            Packet's element.
 	 */
-	public Element getElement() {
-		return element;
+	public static final void addExtension(final Element element, final PacketExtension extension) {
+		element.appendChild(extension.getElement());
 	}
 
 	/**
-	 * Creates a deep copy of this packet extension.
+	 * Returns a {@link PacketExtension} on the first element found in this
+	 * packet for the specified <tt>name</tt> and <tt>namespace</tt> or
+	 * <tt>null</tt> if none was found.
 	 * 
-	 * @return a deep copy of this packet extension.
+	 * @param name
+	 *            the child element name.
+	 * @param namespace
+	 *            the child element namespace.
+	 * @return a PacketExtension on the first element found in this packet for
+	 *         the specified name and namespace or null if none was found.
 	 */
-	public PacketExtension createCopy() {
-		final Element copy = element.createCopy();
-		docFactory.createDocument().add(copy);
-		return new PacketExtension(element);
+	public static final PacketExtension getExtension(final Element element, final String name, final String namespaceURI) {
+		final Element extension = getChildElement(element, name, namespaceURI);
+		if (extension == null)
+			return null;
+
+		final Class<? extends PacketExtension> extensionClass = PacketExtension.getExtensionClass(name, namespaceURI);
+
+		// If a specific PacketExtension implementation has been registered, use
+		// that
+		if (extensionClass != null) {
+			try {
+				final Constructor<? extends PacketExtension> constructor = extensionClass.getDeclaredConstructor(Element.class);
+				return constructor.newInstance(extension);
+			} catch (final Exception e) {
+				log.warn("Packet extension (name " + name + ", namespace " + namespaceURI + ") cannot be found.", e);
+				return null;
+			}
+		}
+
+		return new PacketExtension(extension);
 	}
+
+	/**
+	 * Deletes the first element whose element name and namespace matches the
+	 * specified element name and namespace.
+	 * <p>
+	 * 
+	 * Notice that this method may remove any child element that matches the
+	 * specified element name and namespace even if that element was not added
+	 * to the Packet using a {@link PacketExtension}.
+	 * 
+	 * 
+	 * @param name
+	 *            the child element name.
+	 * @param namespace
+	 *            the child element namespace.
+	 * @return true if a child element was removed.
+	 */
+	public static final boolean deleteExtension(final Element element, final String name, final String namespaceURI) {
+		final Element extension = getChildElement(element, name, namespaceURI);
+		if (extension == null)
+			return false;
+
+		return element.removeChild(extension) != null;
+	}
+
 }

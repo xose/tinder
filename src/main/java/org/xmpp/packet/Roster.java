@@ -23,9 +23,7 @@ import java.util.Iterator;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
+import org.w3c.dom.Element;
 
 /**
  * Roster packet. The roster is a list of JIDs (typically other users) that the
@@ -44,7 +42,7 @@ public class Roster extends IQ {
 	 */
 	public Roster() {
 		super();
-		element.addElement("query", "jabber:iq:roster");
+		setIQChildElement("query", "jabber:iq:roster");
 	}
 
 	/**
@@ -56,7 +54,7 @@ public class Roster extends IQ {
 	 */
 	public Roster(final Type type) {
 		super(type);
-		element.addElement("query", "jabber:iq:roster");
+		addChildElement(element, "query", "jabber:iq:roster");
 	}
 
 	/**
@@ -70,19 +68,6 @@ public class Roster extends IQ {
 	public Roster(final Type type, final String ID) {
 		super(type, ID);
 		element.addElement("query", "jabber:iq:roster");
-	}
-
-	/**
-	 * Constructs a new Roster that is a copy of an existing Roster.
-	 * 
-	 * @param roster
-	 *            the roster packet.
-	 * @see #createCopy()
-	 */
-	private Roster(final Roster roster) {
-		final Element elementCopy = roster.element.createCopy();
-		docFactory.createDocument().add(elementCopy);
-		element = elementCopy;
 	}
 
 	/**
@@ -259,16 +244,6 @@ public class Roster extends IQ {
 			}
 		}
 		return Collections.unmodifiableCollection(items);
-	}
-
-	/**
-	 * Returns a deep copy of this Roster.
-	 * 
-	 * @return a deep copy of this Roster.
-	 */
-	@Override
-	public Roster createCopy() {
-		return new Roster(this);
 	}
 
 	/**

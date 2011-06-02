@@ -49,8 +49,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("from.address");
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("from.address"));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -83,8 +83,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("from.address");
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("from.address"));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -120,8 +120,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("user@notthesame" + component.getDomain());
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("user@notthesame" + component.getDomain()));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -155,8 +155,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("user@" + component.getDomain());
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("user@" + component.getDomain()));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -190,8 +190,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("user@notthesame" + component.getDomain());
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("user@notthesame" + component.getDomain()));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -225,8 +225,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ pingRequest = new IQ(Type.get);
-		pingRequest.setChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
-		pingRequest.setFrom("user@" + component.getDomain());
+		pingRequest.setIQChildElement("ping", AbstractComponent.NAMESPACE_XMPP_PING);
+		pingRequest.setFrom(new JID("user@" + component.getDomain()));
 		pingRequest.setTo(component.jid);
 
 		// do magic
@@ -327,8 +327,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
-		request.setFrom("from.address");
+		request.setIQChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
+		request.setFrom(new JID("from.address"));
 		request.setTo(component.jid);
 		final int wait = 2;
 
@@ -341,7 +341,7 @@ public class AbstractComponentTest {
 		final IQ result = (IQ) component.getSentPacket();
 		assertNotNull(result);
 		assertEquals(Type.result, result.getType());
-		assertEquals(String.valueOf(wait), result.getChildElement().attributeValue("seconds"));
+		assertEquals(String.valueOf(wait), result.getIQChildElement().getAttribute("seconds"));
 	}
 
 	/**
@@ -358,8 +358,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
-		request.setFrom("from.address");
+		request.setIQChildElement("ping", AbstractComponent.NAMESPACE_LAST_ACTIVITY);
+		request.setFrom(new JID("from.address"));
 		request.setTo(component.jid);
 		final int wait = 2;
 
@@ -375,7 +375,7 @@ public class AbstractComponentTest {
 		final IQ result = (IQ) component.getSentPacket();
 		assertNotNull(result);
 		assertEquals(Type.result, result.getType());
-		assertEquals(String.valueOf(wait), result.getChildElement().attributeValue("seconds"));
+		assertEquals(String.valueOf(wait), result.getIQChildElement().getAttribute("seconds"));
 	}
 
 	/**
@@ -389,8 +389,8 @@ public class AbstractComponentTest {
 		component.initialize(new JID("sub.domain"), null);
 
 		final IQ request = new IQ(Type.get);
-		request.setChildElement("ping", AbstractComponent.NAMESPACE_ENTITY_TIME);
-		request.setFrom("from.address");
+		request.setIQChildElement("ping", AbstractComponent.NAMESPACE_ENTITY_TIME);
+		request.setFrom(new JID("from.address"));
 		request.setTo(component.jid);
 
 		// do magic

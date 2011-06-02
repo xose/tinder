@@ -16,17 +16,12 @@
 
 package org.xmpp.packet;
 
-import java.lang.reflect.Constructor;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Random;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * IQ (Info/Query) packet. IQ packets are used to get and set information on the
@@ -41,21 +36,16 @@ import org.slf4j.LoggerFactory;
 @NotThreadSafe
 public class IQ extends Packet {
 
-	private static final Logger Log = LoggerFactory.getLogger(Packet.class);
-
 	// Sequence and random number generator used for creating unique ID's.
+	private static final Random random = new Random();
 	private static int sequence = 0;
-	private static Random random = new Random();
 
 	/**
 	 * Constructs a new IQ with an automatically generated ID and a type of
 	 * {@link Type#get IQ.Type.get}.
 	 */
 	public IQ() {
-		element = docFactory.createDocument().addElement("iq");
-		final String id = String.valueOf(random.nextInt(1000) + "-" + sequence++);
-		setType(Type.get);
-		setID(id);
+		this(Type.get, null);
 	}
 
 	/**
@@ -66,10 +56,7 @@ public class IQ extends Packet {
 	 *            the IQ type.
 	 */
 	public IQ(final Type type) {
-		element = docFactory.createDocument().addElement("iq");
-		setType(type);
-		final String id = String.valueOf(random.nextInt(1000) + "-" + sequence++);
-		setID(id);
+		this(type, null);
 	}
 
 	/**
@@ -81,9 +68,9 @@ public class IQ extends Packet {
 	 *            the IQ type.
 	 */
 	public IQ(final Type type, final String ID) {
-		element = docFactory.createDocument().addElement("iq");
+		super("iq");
 		setType(type);
-		setID(ID);
+		setID(ID != null ? ID : String.valueOf(random.nextInt(1000) + "-" + sequence++));
 	}
 
 	/**
@@ -98,47 +85,15 @@ public class IQ extends Packet {
 	}
 
 	/**
-	 * Constructs a new IQ using an existing Element. This is useful for parsing
-	 * incoming IQ Elements into IQ objects. Stringprep validation on the TO
-	 * address can be disabled. The FROM address will not be validated since the
-	 * server is the one that sets that value.
-	 * 
-	 * @param element
-	 *            the IQ Element.
-	 * @param skipValidation
-	 *            true if stringprep should not be applied to the TO address.
-	 */
-	public IQ(final Element element, final boolean skipValidation) {
-		super(element, skipValidation);
-	}
-
-	/**
-	 * Constructs a new IQ that is a copy of an existing IQ.
-	 * 
-	 * @param iq
-	 *            the iq packet.
-	 * @see #createCopy()
-	 */
-	private IQ(final IQ iq) {
-		final Element elementCopy = iq.element.createCopy();
-		docFactory.createDocument().add(elementCopy);
-		element = elementCopy;
-		// Copy cached JIDs (for performance reasons)
-		toJID = iq.toJID;
-		fromJID = iq.fromJID;
-	}
-
-	/**
 	 * Returns the type of this IQ.
 	 * 
 	 * @return the IQ type.
 	 * @see Type
 	 */
-	public Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return Type.valueOf(type);
-		return null;
+	public final Type getType() {
+		final String type = getAttribute(element, "type");
+
+		return type != null ? Type.valueOf(type) : null;
 	}
 
 	/**
@@ -148,8 +103,8 @@ public class IQ extends Packet {
 	 *            the IQ type.
 	 * @see Type
 	 */
-	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toString());
+	public final void setType(final Type type) {
+		setAttribute(element, "type", type != null ? type.toString() : null);
 	}
 
 	/**
@@ -157,8 +112,9 @@ public class IQ extends Packet {
 	 * 
 	 * @return True or false if this is a request stanza
 	 */
-	public boolean isRequest() {
+	public final boolean isRequest() {
 		final Type type = getType();
+
 		return type != null && (type.equals(Type.get) || type.equals(Type.set));
 	}
 
@@ -168,8 +124,9 @@ public class IQ extends Packet {
 	 * 
 	 * @return True or false if this is a response stanza
 	 */
-	public boolean isResponse() {
+	public final boolean isResponse() {
 		final Type type = getType();
+
 		return type != null && (type.equals(Type.result) || type.equals(Type.error));
 	}
 
@@ -186,17 +143,16 @@ public class IQ extends Packet {
 	 * 
 	 * @return the child element.
 	 */
-	@SuppressWarnings("unchecked")
-	public Element getChildElement() {
-		final List<Element> elements = element.elements();
-		if (elements.isEmpty())
+	public Element getIQChildElement() {
+		final NodeList elements = element.getChildNodes();
+		if (elements.getLength() == 0)
 			return null;
 
 		// Search for a child element that is in a different namespace.
-		for (int i = 0; i < elements.size(); i++) {
-			final Element element = elements.get(i);
+		for (int i = 0; i < elements.getLength(); i++) {
+			final Element element = (Element) elements.item(i);
 			final String namespace = element.getNamespaceURI();
-			if (!namespace.equals("") && !namespace.equals("jabber:client") && !namespace.equals("jabber:server"))
+			if (namespace != null && !namespace.equals("jabber:client") && !namespace.equals("jabber:server"))
 				return element;
 		}
 		return null;
@@ -226,12 +182,13 @@ public class IQ extends Packet {
 	 * @param childElement
 	 *            the child element.
 	 */
-	@SuppressWarnings("unchecked")
-	public void setChildElement(final Element childElement) {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			element.remove(i.next());
+	public void setIQChildElement(final Element childElement) {
+		final Element currentChild = getIQChildElement();
+		if (currentChild == null) {
+			element.appendChild(childElement);
+		} else {
+			element.replaceChild(childElement, currentChild);
 		}
-		element.add(childElement);
 	}
 
 	/**
@@ -262,12 +219,11 @@ public class IQ extends Packet {
 	 *            the child element namespace.
 	 * @return the newly created child element.
 	 */
-	@SuppressWarnings("unchecked")
-	public Element setChildElement(final String name, final String namespace) {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			element.remove(i.next());
-		}
-		return element.addElement(name, namespace);
+	public Element setIQChildElement(final String qualifiedName, final String namespaceURI) {
+		final Element childElement = element.getOwnerDocument().createElementNS(namespaceURI, qualifiedName);
+		setIQChildElement(childElement);
+		return childElement;
+
 	}
 
 	/**
@@ -295,11 +251,12 @@ public class IQ extends Packet {
 	 */
 	@Override
 	public void addExtension(final PacketExtension extension) {
-		final Element childElement = getChildElement();
+		final Element childElement = getIQChildElement();
 		if (childElement == null)
 			throw new IllegalStateException("Cannot add packet extension when child element is null");
+
 		// Add the extension to the child element
-		childElement.add(extension.getElement());
+		PacketExtension.addExtension(childElement, extension);
 	}
 
 	/**
@@ -322,25 +279,13 @@ public class IQ extends Packet {
 	 *         found.
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public PacketExtension getExtension(final String name, final String namespace) {
-		final Element childElement = getChildElement();
+	public PacketExtension getExtension(final String name, final String namespaceURI) {
+		final Element childElement = getIQChildElement();
 		if (childElement == null)
 			return null;
+
 		// Search for extensions in the child element
-		final List<Element> extensions = childElement.elements(QName.get(name, namespace));
-		if (!extensions.isEmpty()) {
-			final Class<? extends PacketExtension> extensionClass = PacketExtension.getExtensionClass(name, namespace);
-			if (extensionClass != null) {
-				try {
-					final Constructor<? extends PacketExtension> constructor = extensionClass.getDeclaredConstructor(new Class[] { Element.class });
-					return constructor.newInstance(new Object[] { extensions.get(0) });
-				} catch (final Exception e) {
-					Log.warn("Packet extension (name " + name + ", namespace " + namespace + ") cannot be found.", e);
-				}
-			}
-		}
-		return null;
+		return PacketExtension.getExtension(childElement, name, namespaceURI);
 	}
 
 	/**
@@ -366,28 +311,13 @@ public class IQ extends Packet {
 	 * @return true if a child element was removed.
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public boolean deleteExtension(final String name, final String namespace) {
-		final Element childElement = getChildElement();
+	public boolean deleteExtension(final String name, final String namespaceURI) {
+		final Element childElement = getIQChildElement();
 		if (childElement == null)
 			return false;
-		// Delete extensions in the child element
-		final List<Element> extensions = childElement.elements(QName.get(name, namespace));
-		if (!extensions.isEmpty()) {
-			childElement.remove(extensions.get(0));
-			return true;
-		}
-		return false;
-	}
 
-	/**
-	 * Returns a deep copy of this IQ.
-	 * 
-	 * @return a deep copy of this IQ.
-	 */
-	@Override
-	public IQ createCopy() {
-		return new IQ(this);
+		// Delete extensions in the child element
+		return PacketExtension.deleteExtension(childElement, name, namespaceURI);
 	}
 
 	/**
@@ -412,8 +342,9 @@ public class IQ extends Packet {
 	 *         originating IQ.
 	 */
 	public static IQ createResultIQ(final IQ iq) {
-		if (!(iq.getType() == Type.get || iq.getType() == Type.set))
-			throw new IllegalArgumentException("IQ must be of type 'set' or 'get'. Original IQ: " + iq.toXML());
+		if (!iq.isRequest())
+			throw new IllegalArgumentException("IQ must be of type 'set' or 'get'. Original IQ: " + iq.toString());
+
 		final IQ result = new IQ(Type.result, iq.getID());
 		result.setFrom(iq.getTo());
 		result.setTo(iq.getFrom());

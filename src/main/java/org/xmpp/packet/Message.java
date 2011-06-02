@@ -16,11 +16,9 @@
 
 package org.xmpp.packet;
 
-import java.util.Iterator;
-
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 
 /**
  * Message packet.
@@ -84,7 +82,7 @@ public class Message extends Packet {
 	 * Constructs a new Message.
 	 */
 	public Message() {
-		element = docFactory.createDocument().addElement("message");
+		super("message");
 	}
 
 	/**
@@ -99,47 +97,15 @@ public class Message extends Packet {
 	}
 
 	/**
-	 * Constructs a new Message using an existing Element. This is useful for
-	 * parsing incoming message Elements into Message objects. Stringprep
-	 * validation on the TO address can be disabled. The FROM address will not
-	 * be validated since the server is the one that sets that value.
-	 * 
-	 * @param element
-	 *            the message Element.
-	 * @param skipValidation
-	 *            true if stringprep should not be applied to the TO address.
-	 */
-	public Message(final Element element, final boolean skipValidation) {
-		super(element, skipValidation);
-	}
-
-	/**
-	 * Constructs a new Message that is a copy of an existing Message.
-	 * 
-	 * @param message
-	 *            the message packet.
-	 * @see #createCopy()
-	 */
-	private Message(final Message message) {
-		final Element elementCopy = message.element.createCopy();
-		docFactory.createDocument().add(elementCopy);
-		element = elementCopy;
-		// Copy cached JIDs (for performance reasons)
-		toJID = message.toJID;
-		fromJID = message.fromJID;
-	}
-
-	/**
 	 * Returns the type of this message
 	 * 
 	 * @return the message type.
 	 * @see Type
 	 */
 	public Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return Type.valueOf(type);
-		return Type.normal;
+		final String type = getAttribute(element, "type");
+
+		return type != null ? Type.valueOf(type) : Type.normal;
 	}
 
 	/**
@@ -150,7 +116,7 @@ public class Message extends Packet {
 	 * @see Type
 	 */
 	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toString());
+		setAttribute(element, "type", type != null ? type.toString() : null);
 	}
 
 	/**
@@ -160,7 +126,7 @@ public class Message extends Packet {
 	 * @return the subject.
 	 */
 	public String getSubject() {
-		return element.elementText("subject");
+		return getChildElementText(element, "subject");
 	}
 
 	/**
@@ -170,19 +136,7 @@ public class Message extends Packet {
 	 *            the subject.
 	 */
 	public void setSubject(final String subject) {
-		Element subjectElement = element.element("subject");
-		// If subject is null, clear the subject.
-		if (subject == null && subjectElement != null) {
-			element.remove(subjectElement);
-			return;
-		}
-		// Do nothing if the new subject is null
-		if (subject == null)
-			return;
-		if (subjectElement == null) {
-			subjectElement = element.addElement("subject");
-		}
-		subjectElement.setText(subject);
+		setChildElementText(element, "subject", subject);
 	}
 
 	/**
@@ -191,7 +145,7 @@ public class Message extends Packet {
 	 * @return the body.
 	 */
 	public String getBody() {
-		return element.elementText("body");
+		return getChildElementText(element, "body");
 	}
 
 	/**
@@ -201,18 +155,7 @@ public class Message extends Packet {
 	 *            the body.
 	 */
 	public void setBody(final String body) {
-		Element bodyElement = element.element("body");
-		// If body is null, clear the body.
-		if (body == null) {
-			if (bodyElement != null) {
-				element.remove(bodyElement);
-			}
-			return;
-		}
-		if (bodyElement == null) {
-			bodyElement = element.addElement("body");
-		}
-		bodyElement.setText(body);
+		setChildElementText(element, "body", body);
 	}
 
 	/**
@@ -223,7 +166,7 @@ public class Message extends Packet {
 	 * @return the thread value.
 	 */
 	public String getThread() {
-		return element.elementText("thread");
+		return getChildElementText(element, "thread");
 	}
 
 	/**
@@ -235,84 +178,7 @@ public class Message extends Packet {
 	 *            thread value.
 	 */
 	public void setThread(final String thread) {
-		Element threadElement = element.element("thread");
-		// If thread is null, clear the thread.
-		if (thread == null) {
-			if (threadElement != null) {
-				element.remove(threadElement);
-			}
-			return;
-		}
-
-		if (threadElement == null) {
-			threadElement = element.addElement("thread");
-		}
-		threadElement.setText(thread);
-	}
-
-	/**
-	 * Returns the first child element of this packet that matches the given
-	 * name and namespace. If no matching element is found, <tt>null</tt> will
-	 * be returned. This is a convenience method to avoid manipulating this
-	 * underlying packet's Element instance directly.
-	 * <p>
-	 * 
-	 * Child elements in extended namespaces are used to extend the features of
-	 * XMPP. Examples include a "user is typing" indicator and invitations to
-	 * group chat rooms. Although any valid XML can be included in a child
-	 * element in an extended namespace, many common features have been
-	 * standardized as <a href="http://xmpp.org/extensions/">XMPP Extension
-	 * Protocols</a> (XEPs).
-	 * 
-	 * @param name
-	 *            the element name.
-	 * @param namespace
-	 *            the element namespace.
-	 * @return the first matching child element, or <tt>null</tt> if there is no
-	 *         matching child element.
-	 */
-	@SuppressWarnings("unchecked")
-	public Element getChildElement(final String name, final String namespace) {
-		for (final Iterator<Element> i = element.elementIterator(name); i.hasNext();) {
-			final Element element = i.next();
-			if (element.getNamespaceURI().equals(namespace))
-				return element;
-		}
-		return null;
-	}
-
-	/**
-	 * Adds a new child element to this packet with the given name and
-	 * namespace. The newly created Element is returned. This is a convenience
-	 * method to avoid manipulating this underlying packet's Element instance
-	 * directly.
-	 * <p>
-	 * 
-	 * Child elements in extended namespaces are used to extend the features of
-	 * XMPP. Examples include a "user is typing" indicator and invitations to
-	 * group chat rooms. Although any valid XML can be included in a child
-	 * element in an extended namespace, many common features have been
-	 * standardized as <a href="http://xmpp.org/extensions/">XMPP Extension
-	 * Protocols</a> (XEPs).
-	 * 
-	 * @param name
-	 *            the element name.
-	 * @param namespace
-	 *            the element namespace.
-	 * @return the newly created child element.
-	 */
-	public Element addChildElement(final String name, final String namespace) {
-		return element.addElement(name, namespace);
-	}
-
-	/**
-	 * Returns a deep copy of this Message.
-	 * 
-	 * @return a deep copy of this Message.
-	 */
-	@Override
-	public Message createCopy() {
-		return new Message(this);
+		setChildElementText(element, "thread", thread);
 	}
 
 	/**

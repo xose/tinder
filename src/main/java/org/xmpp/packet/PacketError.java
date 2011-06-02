@@ -16,16 +16,15 @@
 
 package org.xmpp.packet;
 
-import java.io.StringWriter;
 import java.util.Iterator;
+
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
+import org.w3c.dom.Element;
+import org.xmpp.util.BaseXML;
 
 /**
  * A packet error. Errors must have a type and condition. Optionally, they can
@@ -34,13 +33,9 @@ import org.dom4j.io.XMLWriter;
  * @author Matt Tucker
  */
 @NotThreadSafe
-public class PacketError {
+public class PacketError extends BaseXML {
 
 	private static final String ERROR_NAMESPACE = "urn:ietf:params:xml:ns:xmpp-stanzas";
-
-	private static DocumentFactory docFactory = DocumentFactory.getInstance();
-
-	private final Element element;
 
 	/**
 	 * Construcs a new PacketError with the specified condition. The error type
@@ -50,9 +45,7 @@ public class PacketError {
 	 *            the error condition.
 	 */
 	public PacketError(final Condition condition) {
-		element = docFactory.createElement("error");
-		setCondition(condition);
-		setType(condition.getDefaultType());
+		this(condition, condition.getDefaultType(), null, null);
 	}
 
 	/**
@@ -64,9 +57,7 @@ public class PacketError {
 	 *            the error type.
 	 */
 	public PacketError(final Condition condition, final Type type) {
-		element = docFactory.createElement("error");
-		setCondition(condition);
-		setType(type);
+		this(condition, type, null, null);
 	}
 
 	/**
@@ -80,10 +71,7 @@ public class PacketError {
 	 *            the text description of the error.
 	 */
 	public PacketError(final Condition condition, final Type type, final String text) {
-		element = docFactory.createElement("error");
-		setType(type);
-		setCondition(condition);
-		setText(text, null);
+		this(condition, type, text, null);
 	}
 
 	/**
@@ -99,9 +87,9 @@ public class PacketError {
 	 *            the language code of the error description (e.g. "en").
 	 */
 	public PacketError(final Condition condition, final Type type, final String text, final String lang) {
-		element = docFactory.createElement("error");
-		setType(type);
+		super("error");
 		setCondition(condition);
+		setType(type);
 		setText(text, lang);
 	}
 
@@ -113,7 +101,7 @@ public class PacketError {
 	 *            the error Element.
 	 */
 	public PacketError(final Element element) {
-		this.element = element;
+		super(element);
 	}
 
 	/**
@@ -122,11 +110,10 @@ public class PacketError {
 	 * @return the error type.
 	 * @see Type
 	 */
-	public Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return Type.fromXMPP(type);
-		return null;
+	public final Type getType() {
+		final String type = element.getAttribute("type");
+
+		return !type.isEmpty() ? Type.fromXMPP(type) : null;
 	}
 
 	/**
@@ -136,8 +123,12 @@ public class PacketError {
 	 *            the error type.
 	 * @see Type
 	 */
-	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toXMPP());
+	public final void setType(final Type type) {
+		if (type != null) {
+			element.setAttribute("type", type.toXMPP());
+		} else {
+			element.removeAttribute("type");
+		}
 	}
 
 	/**
@@ -227,11 +218,11 @@ public class PacketError {
 	 *            specify no language code.
 	 */
 	public void setText(final String text, final String lang) {
-		Element textElement = element.element("text");
+		final Element textElement = (Element) element.getElementsByTagName("text").item(0);
 		// If text is null, clear the text.
 		if (text == null) {
 			if (textElement != null) {
-				element.remove(textElement);
+				element.removeChild(textElement);
 			}
 			return;
 		}
@@ -243,7 +234,8 @@ public class PacketError {
 			}
 			element.add(textElement);
 		}
-		textElement.setText(text);
+
+		textElement.setTextContent(text);
 	}
 
 	/**
@@ -253,10 +245,9 @@ public class PacketError {
 	 * @return the language code of the text description, if it exists.
 	 */
 	public String getTextLang() {
-		final Element textElement = element.element("text");
-		if (textElement != null)
-			return textElement.attributeValue(QName.get("lang", "xml", "http://www.w3.org/XML/1998/namespace"));
-		return null;
+		final Element textElement = (Element) element.getElementsByTagName("text").item(0);
+
+		return textElement != null ? textElement.getAttributeNS(XMLConstants.XML_NS_URI, "xml:lang") : null;
 	}
 
 	/**
@@ -341,38 +332,6 @@ public class PacketError {
 				return el.getNamespaceURI();
 		}
 		return null;
-	}
-
-	/**
-	 * Returns the DOM4J Element that backs the error. The element is the
-	 * definitive representation of the error and can be manipulated directly to
-	 * change error contents.
-	 * 
-	 * @return the DOM4J Element.
-	 */
-	public Element getElement() {
-		return element;
-	}
-
-	/**
-	 * Returns the textual XML representation of this error.
-	 * 
-	 * @return the textual XML representation of this error.
-	 */
-	public String toXML() {
-		return element.asXML();
-	}
-
-	@Override
-	public String toString() {
-		final StringWriter out = new StringWriter();
-		final XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
-		try {
-			writer.write(element);
-		} catch (final Exception e) {
-			// Ignore.
-		}
-		return out.toString();
 	}
 
 	/**

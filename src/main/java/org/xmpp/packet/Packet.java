@@ -16,19 +16,10 @@
 
 package org.xmpp.packet;
 
-import java.io.StringWriter;
-import java.lang.reflect.Constructor;
-import java.util.List;
-
 import net.jcip.annotations.NotThreadSafe;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.QName;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.XMLWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.xmpp.util.BaseXML;
 
 /**
  * An XMPP packet (also referred to as a stanza). Each packet is backed by a
@@ -48,78 +39,18 @@ import org.slf4j.LoggerFactory;
  * @author Matt Tucker
  */
 @NotThreadSafe
-public abstract class Packet {
+public class Packet extends BaseXML {
 
-	private static final Logger Log = LoggerFactory.getLogger(Packet.class);
-
-	protected static final DocumentFactory docFactory = DocumentFactory.getInstance();
-
-	protected Element element;
-
-	// Cache to and from JIDs
-	protected JID toJID;
-	protected JID fromJID;
-
-	/**
-	 * Constructs a new Packet. The TO address contained in the XML Element will
-	 * only be validated. In other words, stringprep operations will only be
-	 * performed on the TO JID to verify that it is well-formed. The FROM
-	 * address is assigned by the server so there is no need to verify it.
-	 * 
-	 * @param element
-	 *            the XML Element that contains the packet contents.
-	 */
-	public Packet(final Element element) {
-		this(element, false);
+	protected Packet(final String elementName) {
+		super(elementName);
 	}
 
-	/**
-	 * Constructs a new Packet. The JID address contained in the XML Element may
-	 * not be validated. When validation can be skipped then stringprep
-	 * operations will not be performed on the JIDs to verify that addresses are
-	 * well-formed. However, when validation cannot be skipped then
-	 * <tt>only</tt> the TO address will be verified. The FROM address is
-	 * assigned by the server so there is no need to verify it.
-	 * 
-	 * @param element
-	 *            the XML Element that contains the packet contents.
-	 * @param skipValidation
-	 *            true if stringprep should not be applied to the TO address.
-	 */
-	public Packet(final Element element, final boolean skipValidation) {
-		this.element = element;
-		// Apply stringprep profiles to the "to" and "from" values.
-		final String to = element.attributeValue("to");
-		if (to != null) {
-			if (to.length() == 0) {
-				// Remove empty TO values
-				element.addAttribute("to", null);
-			} else {
-				final String[] parts = JID.getParts(to);
-				toJID = new JID(parts[0], parts[1], parts[2], skipValidation);
-				element.addAttribute("to", toJID.toString());
-			}
-		}
-		final String from = element.attributeValue("from");
-		if (from != null) {
-			if (from.length() == 0) {
-				// Remove empty FROM values
-				element.addAttribute("from", null);
-			} else {
-				final String[] parts = JID.getParts(from);
-				fromJID = new JID(parts[0], parts[1], parts[2], true);
-				element.addAttribute("from", fromJID.toString());
-			}
-		}
+	protected Packet(final String qualifiedName, final String namespaceURI) {
+		super(qualifiedName, namespaceURI);
 	}
 
-	/**
-	 * Constructs a new Packet with no element data. This method is used by
-	 * extensions of this class that require a more optimized path for creating
-	 * new packets.
-	 */
-	protected Packet() {
-
+	protected Packet(final Element element) {
+		super(element);
 	}
 
 	/**
@@ -128,8 +59,8 @@ public abstract class Packet {
 	 * 
 	 * @return the packet ID.
 	 */
-	public String getID() {
-		return element.attributeValue("id");
+	public final String getID() {
+		return getAttribute(element, "id");
 	}
 
 	/**
@@ -138,69 +69,8 @@ public abstract class Packet {
 	 * @param ID
 	 *            the packet ID.
 	 */
-	public void setID(final String ID) {
-		element.addAttribute("id", ID);
-	}
-
-	/**
-	 * Returns the XMPP address (JID) that the packet is addressed to, or
-	 * <tt>null</tt> if the "to" attribute is not set. The XMPP protocol often
-	 * makes the "to" attribute optional, so it does not always need to be set.
-	 * 
-	 * @return the XMPP address (JID) that the packet is addressed to, or
-	 *         <tt>null</tt> if not set.
-	 */
-	public JID getTo() {
-		final String to = element.attributeValue("to");
-		if (to == null || to.length() == 0)
-			return null;
-
-		if (toJID != null && to.equals(toJID.toString()))
-			return toJID;
-
-		// Return a new JID that bypasses stringprep profile checking.
-		// This improves speed and is safe as long as the user doesn't
-		// directly manipulate the attributes of the underlying Element
-		// that represent JID's.
-		final String[] parts = JID.getParts(to);
-		toJID = new JID(parts[0], parts[1], parts[2], true);
-		return toJID;
-	}
-
-	/**
-	 * Sets the XMPP address (JID) that the packet is addressed to. The XMPP
-	 * protocol often makes the "to" attribute optional, so it does not always
-	 * need to be set.
-	 * 
-	 * @param to
-	 *            the XMPP address (JID) that the packet is addressed to.
-	 */
-	public void setTo(String to) {
-		// Apply stringprep profiles to value.
-		if (to != null) {
-			toJID = new JID(to);
-			to = toJID.toString();
-		} else {
-			toJID = null;
-		}
-		element.addAttribute("to", to);
-	}
-
-	/**
-	 * Sets the XMPP address (JID) that the packet is address to. The XMPP
-	 * protocol often makes the "to" attribute optional, so it does not always
-	 * need to be set.
-	 * 
-	 * @param to
-	 *            the XMPP address (JID) that the packet is addressed to.
-	 */
-	public void setTo(final JID to) {
-		toJID = to;
-		if (to == null) {
-			element.addAttribute("to", null);
-		} else {
-			element.addAttribute("to", to.toString());
-		}
+	public final void setID(final String id) {
+		setAttribute(element, "id", id);
 	}
 
 	/**
@@ -211,21 +81,10 @@ public abstract class Packet {
 	 * @return the XMPP address that the packet is from, or <tt>null</tt> if not
 	 *         set.
 	 */
-	public JID getFrom() {
-		final String from = element.attributeValue("from");
-		if (from == null || from.length() == 0)
-			return null;
+	public final JID getFrom() {
+		final String from = getAttribute(element, "from");
 
-		if (fromJID != null && from.equals(fromJID.toString()))
-			return fromJID;
-
-		// Return a new JID that bypasses stringprep profile checking.
-		// This improves speed and is safe as long as the user doesn't
-		// directly manipulate the attributes of the underlying Element
-		// that represent JID's.
-		final String[] parts = JID.getParts(from);
-		fromJID = new JID(parts[0], parts[1], parts[2], true);
-		return fromJID;
+		return from != null ? new JID(from) : null;
 	}
 
 	/**
@@ -236,32 +95,34 @@ public abstract class Packet {
 	 * @param from
 	 *            the XMPP address (JID) that the packet comes from.
 	 */
-	public void setFrom(String from) {
-		// Apply stringprep profiles to value.
-		if (from != null) {
-			fromJID = new JID(from);
-			from = fromJID.toString();
-		} else {
-			fromJID = null;
-		}
-		element.addAttribute("from", from);
+	public final void setFrom(final JID from) {
+		setAttribute(element, "from", from != null ? from.toString() : null);
 	}
 
 	/**
-	 * Sets the XMPP address (JID) that the packet comes from. The XMPP protocol
-	 * often makes the "from" attribute optional, so it does not always need to
-	 * be set.
+	 * Returns the XMPP address (JID) that the packet is addressed to, or
+	 * <tt>null</tt> if the "to" attribute is not set. The XMPP protocol often
+	 * makes the "to" attribute optional, so it does not always need to be set.
 	 * 
-	 * @param from
-	 *            the XMPP address (JID) that the packet comes from.
+	 * @return the XMPP address (JID) that the packet is addressed to, or
+	 *         <tt>null</tt> if not set.
 	 */
-	public void setFrom(final JID from) {
-		fromJID = from;
-		if (from == null) {
-			element.addAttribute("from", null);
-		} else {
-			element.addAttribute("from", from.toString());
-		}
+	public final JID getTo() {
+		final String to = getAttribute(element, "to");
+
+		return to != null ? new JID(to) : null;
+	}
+
+	/**
+	 * Sets the XMPP address (JID) that the packet is address to. The XMPP
+	 * protocol often makes the "to" attribute optional, so it does not always
+	 * need to be set.
+	 * 
+	 * @param to
+	 *            the XMPP address (JID) that the packet is addressed to.
+	 */
+	public final void setTo(final JID to) {
+		setAttribute(element, "to", to != null ? to.toString() : null);
 	}
 
 	/**
@@ -277,7 +138,7 @@ public abstract class Packet {
 	 *            Packet's element.
 	 */
 	public void addExtension(final PacketExtension extension) {
-		element.add(extension.getElement());
+		PacketExtension.addExtension(element, extension);
 	}
 
 	/**
@@ -292,24 +153,8 @@ public abstract class Packet {
 	 * @return a PacketExtension on the first element found in this packet for
 	 *         the specified name and namespace or null if none was found.
 	 */
-	@SuppressWarnings("unchecked")
-	public PacketExtension getExtension(final String name, final String namespace) {
-		final List<Element> extensions = element.elements(QName.get(name, namespace));
-		if (!extensions.isEmpty()) {
-			final Class<? extends PacketExtension> extensionClass = PacketExtension.getExtensionClass(name, namespace);
-			// If a specific PacketExtension implementation has been registered,
-			// use that.
-			if (extensionClass != null) {
-				try {
-					final Constructor<? extends PacketExtension> constructor = extensionClass.getDeclaredConstructor(Element.class);
-					return constructor.newInstance(extensions.get(0));
-				} catch (final Exception e) {
-					Log.warn("Packet extension (name " + name + ", namespace " + namespace + ") cannot be found.", e);
-				}
-			} else
-				return new PacketExtension(extensions.get(0));
-		}
-		return null;
+	public PacketExtension getExtension(final String name, final String namespaceURI) {
+		return PacketExtension.getExtension(element, name, namespaceURI);
 	}
 
 	/**
@@ -328,14 +173,8 @@ public abstract class Packet {
 	 *            the child element namespace.
 	 * @return true if a child element was removed.
 	 */
-	@SuppressWarnings("unchecked")
-	public boolean deleteExtension(final String name, final String namespace) {
-		final List<Element> extensions = element.elements(QName.get(name, namespace));
-		if (!extensions.isEmpty()) {
-			element.remove(extensions.get(0));
-			return true;
-		}
-		return false;
+	public boolean deleteExtension(final String name, final String namespaceURI) {
+		return PacketExtension.deleteExtension(element, name, namespaceURI);
 	}
 
 	/**
@@ -343,11 +182,10 @@ public abstract class Packet {
 	 * 
 	 * @return the packet error.
 	 */
-	public PacketError getError() {
-		final Element error = element.element("error");
-		if (error != null)
-			return new PacketError(error);
-		return null;
+	public final PacketError getError() {
+		final Element error = getChildElement(element, "error");
+
+		return error != null ? new PacketError(error) : null;
 	}
 
 	/**
@@ -357,17 +195,18 @@ public abstract class Packet {
 	 * @param error
 	 *            the packet error.
 	 */
-	public void setError(final PacketError error) {
-		if (element == null)
+	public final void setError(final PacketError error) {
+		if (error == null)
 			throw new NullPointerException("Error cannot be null");
+
 		// Force the packet type to "error".
-		element.addAttribute("type", "error");
+		setAttribute(element, "type", "error");
 		// Remove an existing error packet.
-		if (element.element("error") != null) {
-			element.remove(element.element("error"));
+		if (getError() != null) {
+			element.removeChild(getError().getElement());
 		}
 		// Add the error element.
-		element.add(error.getElement());
+		element.appendChild(error.getElement());
 	}
 
 	/**
@@ -380,46 +219,13 @@ public abstract class Packet {
 	 * @param condition
 	 *            the error condition.
 	 */
-	public void setError(final PacketError.Condition condition) {
+	public final void setError(final PacketError.Condition condition) {
 		setError(new PacketError(condition));
 	}
 
-	/**
-	 * Creates a deep copy of this packet.
-	 * 
-	 * @return a deep copy of this packet.
-	 */
-	public abstract Packet createCopy();
-
-	/**
-	 * Returns the DOM4J Element that backs the packet. The element is the
-	 * definitive representation of the packet and can be manipulated directly
-	 * to change packet contents.
-	 * 
-	 * @return the DOM4J Element that represents the packet.
-	 */
-	public Element getElement() {
-		return element;
-	}
-
-	/**
-	 * Returns the textual XML representation of this packet.
-	 * 
-	 * @return the textual XML representation of this packet.
-	 */
-	public String toXML() {
-		return element.asXML();
-	}
-
 	@Override
-	public String toString() {
-		final StringWriter out = new StringWriter();
-		final XMLWriter writer = new XMLWriter(out, OutputFormat.createPrettyPrint());
-		try {
-			writer.write(element);
-		} catch (final Exception e) {
-			// Ignore.
-		}
-		return out.toString();
+	public Packet clone() {
+		return new Packet(element);
 	}
+
 }

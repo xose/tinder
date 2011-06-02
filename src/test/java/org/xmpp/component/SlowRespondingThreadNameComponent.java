@@ -16,7 +16,7 @@
 
 package org.xmpp.component;
 
-import org.dom4j.Element;
+import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 
 /**
@@ -66,28 +66,28 @@ public class SlowRespondingThreadNameComponent extends DummyAbstractComponent {
 	 */
 	@Override
 	protected IQ handleIQGet(final IQ request) throws Exception {
-		final Element element = request.getChildElement();
+		final Element element = request.getIQChildElement();
 		if (!DEBUG_NAMESPACE.equals(element.getNamespaceURI())) {
-			log.debug("Can not process {}", request.toXML());
+			log.debug("Can not process {}", request.toString());
 			return null;
 		}
 
-		if (ELEMENTNAME_SLOWRESPONSE.equals(element.getName())) {
-			log.debug("Waiting 4000 millis before responding to: {}", request.toXML());
+		if (ELEMENTNAME_SLOWRESPONSE.equals(element.getTagName())) {
+			log.debug("Waiting 4000 millis before responding to: {}", request.toString());
 			Thread.sleep(4000);
-			log.debug("Responding to {} now.", request.toXML());
+			log.debug("Responding to {} now.", request.toString());
 			return IQ.createResultIQ(request);
 		}
 
-		if (ELEMENTNAME_THREADNAME.equals(element.getName())) {
+		if (ELEMENTNAME_THREADNAME.equals(element.getTagName())) {
 			final String threadName = Thread.currentThread().getName();
 			final IQ response = IQ.createResultIQ(request);
-			response.setChildElement(ELEMENTNAME_THREADNAME, DEBUG_NAMESPACE).addText(threadName);
-			log.debug("Responding to {} with {}", request.toXML(), response.toXML());
+			response.setIQChildElement(ELEMENTNAME_THREADNAME, DEBUG_NAMESPACE).setTextContent(threadName);
+			log.debug("Responding to {} with {}", request.toString(), response.toString());
 			return response;
 		}
 
-		log.debug("Cannot process {}", request.toXML());
+		log.debug("Cannot process {}", request.toString());
 		return null;
 	}
 }
