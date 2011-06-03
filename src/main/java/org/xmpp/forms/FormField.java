@@ -128,7 +128,7 @@ public class FormField {
 	 *            an indicative of the format for the data to answer.
 	 */
 	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toXMPP());
+		element.addAttribute("type", type == null ? null : type.toString());
 	}
 
 	/**
@@ -364,7 +364,7 @@ public class FormField {
 		 * between two options. The allowable values are 1 for yes/true/assent
 		 * and 0 for no/false/decline. The default value is 0.
 		 */
-		boolean_type("boolean"),
+		boolean_type,
 
 		/**
 		 * The field is intended for data description (e.g., human-readable text
@@ -373,47 +373,47 @@ public class FormField {
 		 * characters); instead an application SHOULD generate multiple fixed
 		 * fields, each with one <value/> child.
 		 */
-		fixed("fixed"),
+		fixed,
 
 		/**
 		 * The field is not shown to the entity providing information, but
 		 * instead is returned with the form.
 		 */
-		hidden("hidden"),
+		hidden,
 
 		/**
 		 * The field enables an entity to gather or provide multiple Jabber IDs.
 		 */
-		jid_multi("jid-multi"),
+		jid_multi,
 
 		/**
 		 * The field enables an entity to gather or provide multiple Jabber IDs.
 		 */
-		jid_single("jid-single"),
+		jid_single,
 
 		/**
 		 * The field enables an entity to gather or provide one or more options
 		 * from among many.
 		 */
-		list_multi("list-multi"),
+		list_multi,
 
 		/**
 		 * The field enables an entity to gather or provide one option from
 		 * among many.
 		 */
-		list_single("list-single"),
+		list_single,
 
 		/**
 		 * The field enables an entity to gather or provide multiple lines of
 		 * text.
 		 */
-		text_multi("text-multi"),
+		text_multi,
 
 		/**
 		 * The field enables an entity to gather or provide a single line or
 		 * word of text, which shall be obscured in an interface (e.g., *****).
 		 */
-		text_private("text-private"),
+		text_private,
 
 		/**
 		 * The field enables an entity to gather or provide a single line or
@@ -421,7 +421,7 @@ public class FormField {
 		 * the default and MUST be assumed if an entity receives a field type it
 		 * does not understand.
 		 */
-		text_single("text-single");
+		text_single;
 
 		/**
 		 * Converts a String value into its Type representation.
@@ -430,38 +430,11 @@ public class FormField {
 		 *            the String value.
 		 * @return the type corresponding to the String.
 		 */
-		public static Type fromXMPP(String type) {
-			if (type == null)
-				throw new NullPointerException();
-			type = type.toLowerCase();
-			if (boolean_type.toXMPP().equals(type))
+		public final static Type fromXMPP(String type) {
+			if (type != null && type.equals("boolean"))
 				return boolean_type;
-			else if (fixed.toXMPP().equals(type))
-				return fixed;
-			else if (hidden.toXMPP().equals(type))
-				return hidden;
-			else if (jid_multi.toXMPP().equals(type))
-				return jid_multi;
-			else if (jid_single.toXMPP().equals(type))
-				return jid_single;
-			else if (list_multi.toXMPP().equals(type))
-				return list_multi;
-			else if (list_single.toXMPP().equals(type))
-				return list_single;
-			else if (text_multi.toXMPP().equals(type))
-				return text_multi;
-			else if (text_private.toXMPP().equals(type))
-				return text_private;
-			else if (text_single.toXMPP().equals(type))
-				return text_single;
-			else
-				throw new IllegalArgumentException("Type invalid:" + type);
-		}
-
-		private String value;
-
-		private Type(final String value) {
-			this.value = value;
+			
+			return valueOf(type);
 		}
 
 		/**
@@ -469,9 +442,12 @@ public class FormField {
 		 * 
 		 * @return the Field Type value.
 		 */
-		public String toXMPP() {
-			return value;
+		@Override
+		public final String toString() {
+			if (this == boolean_type)
+				return "boolean";
+			
+			return super.toString();
 		}
-
 	}
 }

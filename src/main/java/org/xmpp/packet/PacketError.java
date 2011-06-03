@@ -119,7 +119,7 @@ public class PacketError extends BaseXML {
 	 * @see Type
 	 */
 	public final void setType(final Type type) {
-		setAttribute(element, "type", type.toXMPP());
+		setAttribute(element, "type", type.toString());
 	}
 
 	/**
@@ -168,7 +168,7 @@ public class PacketError extends BaseXML {
 			}
 		}
 
-		addChildElement(element, condition.toXMPP(), ERROR_NAMESPACE);
+		addChildElement(element, condition.toString(), ERROR_NAMESPACE);
 	}
 
 	/**
@@ -303,27 +303,27 @@ public class PacketError extends BaseXML {
 		 * (e.g., an IQ stanza that includes an unrecognized value of the 'type'
 		 * attribute); the associated error type SHOULD be "modify".
 		 */
-		bad_request("bad-request", Type.modify, 400),
+		bad_request(Type.modify, 400),
 
 		/**
 		 * Access cannot be granted because an existing resource or session
 		 * exists with the same name or address; the associated error type
 		 * SHOULD be "cancel".
 		 */
-		conflict("conflict", Type.cancel, 409),
+		conflict(Type.cancel, 409),
 
 		/**
 		 * The feature requested is not implemented by the recipient or server
 		 * and therefore cannot be processed; the associated error type SHOULD
 		 * be "cancel".
 		 */
-		feature_not_implemented("feature-not-implemented", Type.cancel, 501),
+		feature_not_implemented(Type.cancel, 501),
 
 		/**
 		 * The requesting entity does not possess the required permissions to
 		 * perform the action; the associated error type SHOULD be "auth".
 		 */
-		forbidden("forbidden", Type.auth, 403),
+		forbidden(Type.auth, 403),
 
 		/**
 		 * The recipient or server can no longer be contacted at this address
@@ -331,20 +331,20 @@ public class PacketError extends BaseXML {
 		 * of the <gone/> element); the associated error type SHOULD be
 		 * "modify".
 		 */
-		gone("gone", Type.modify, 302),
+		gone(Type.modify, 302),
 
 		/**
 		 * The server could not process the stanza because of a misconfiguration
 		 * or an otherwise-undefined internal server error; the associated error
 		 * type SHOULD be "wait".
 		 */
-		internal_server_error("internal-server-error", Type.wait, 500),
+		internal_server_error(Type.wait, 500),
 
 		/**
 		 * The addressed JID or item requested cannot be found; the associated
 		 * error type SHOULD be "cancel".
 		 */
-		item_not_found("item-not-found", Type.cancel, 404),
+		item_not_found(Type.cancel, 404),
 
 		/**
 		 * The sending entity has provided or communicated an XMPP address
@@ -353,7 +353,7 @@ public class PacketError extends BaseXML {
 		 * Addressing Scheme (Section 3); the associated error type SHOULD be
 		 * "modify".
 		 */
-		jid_malformed("jid-malformed", Type.modify, 400),
+		jid_malformed(Type.modify, 400),
 
 		/**
 		 * The recipient or server understands the request but is refusing to
@@ -361,27 +361,27 @@ public class PacketError extends BaseXML {
 		 * or server (e.g., a local policy regarding acceptable words in
 		 * messages); the associated error type SHOULD be "modify".
 		 */
-		not_acceptable("not-acceptable", Type.modify, 406),
+		not_acceptable(Type.modify, 406),
 
 		/**
 		 * The recipient or server does not allow any entity to perform the
 		 * action; the associated error type SHOULD be "cancel".
 		 */
-		not_allowed("not-allowed", Type.cancel, 405),
+		not_allowed(Type.cancel, 405),
 
 		/**
 		 * The sender must provide proper credentials before being allowed to
 		 * perform the action, or has provided improper credentials; the
 		 * associated error type SHOULD be "auth".
 		 */
-		not_authorized("not-authorized", Type.auth, 401),
+		not_authorized(Type.auth, 401),
 
 		/**
 		 * The requesting entity is not authorized to access the requested
 		 * service because payment is required; the associated error type SHOULD
 		 * be "auth".
 		 */
-		payment_required("payment-required", Type.auth, 402),
+		payment_required(Type.auth, 402),
 
 		/**
 		 * The intended recipient is temporarily unavailable; the associated
@@ -390,7 +390,7 @@ public class PacketError extends BaseXML {
 		 * recipient's network availability to an entity that is not authorized
 		 * to know such information).
 		 */
-		recipient_unavailable("recipient-unavailable", Type.wait, 404),
+		recipient_unavailable(Type.wait, 404),
 
 		/**
 		 * The recipient or server is redirecting requests for this information
@@ -399,21 +399,21 @@ public class PacketError extends BaseXML {
 		 * character data of the &lt;redirect/&gt; element); the associated
 		 * error type SHOULD be "modify".
 		 */
-		redirect("redirect", Type.modify, 302),
+		redirect(Type.modify, 302),
 
 		/**
 		 * The requesting entity is not authorized to access the requested
 		 * service because registration is required; the associated error type
 		 * SHOULD be "auth".
 		 */
-		registration_required("registration-required", Type.auth, 407),
+		registration_required(Type.auth, 407),
 
 		/**
 		 * A remote server or service specified as part or all of the JID of the
 		 * intended recipient does not exist; the associated error type SHOULD
 		 * be "cancel".
 		 */
-		remote_server_not_found("remote-server-not-found", Type.cancel, 404),
+		remote_server_not_found(Type.cancel, 404),
 
 		/**
 		 * A remote server or service specified as part or all of the JID of the
@@ -421,26 +421,26 @@ public class PacketError extends BaseXML {
 		 * contacted within a reasonable amount of time; the associated error
 		 * type SHOULD be "wait".
 		 */
-		remote_server_timeout("remote-server-timeout", Type.wait, 504),
+		remote_server_timeout(Type.wait, 504),
 
 		/**
 		 * The server or recipient lacks the system resources necessary to
 		 * service the request; the associated error type SHOULD be "wait".
 		 */
-		resource_constraint("resource-constraint", Type.wait, 500),
+		resource_constraint(Type.wait, 500),
 
 		/**
 		 * The server or recipient does not currently provide the requested
 		 * service; the associated error type SHOULD be "cancel".
 		 */
-		service_unavailable("service-unavailable", Type.cancel, 503),
+		service_unavailable(Type.cancel, 503),
 
 		/**
 		 * The requesting entity is not authorized to access the requested
 		 * service because a subscription is required; the associated error type
 		 * SHOULD be "auth".
 		 */
-		subscription_required("subscription-required", Type.auth, 407),
+		subscription_required(Type.auth, 407),
 
 		/**
 		 * The error condition is not one of those defined by the other
@@ -452,14 +452,14 @@ public class PacketError extends BaseXML {
 		 * Implementation note: the default type for this condition is
 		 * {@link Type#wait}, which is not specified in the XMPP protocol.
 		 */
-		undefined_condition("undefined-condition", Type.wait, 500),
+		undefined_condition(Type.wait, 500),
 
 		/**
 		 * The recipient or server understood the request but was not expecting
 		 * it at this time (e.g., the request was out of order); the associated
 		 * error type SHOULD be "wait".
 		 */
-		unexpected_request("unexpected-request", Type.wait, 400);
+		unexpected_request(Type.wait, 400);
 
 		/**
 		 * Converts a String value into its Condition representation.
@@ -468,115 +468,25 @@ public class PacketError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public static Condition fromXMPP(String condition) {
-			if (condition == null)
-				throw new NullPointerException();
-			condition = condition.toLowerCase();
-			if (bad_request.toXMPP().equals(condition))
-				return bad_request;
-			else if (conflict.toXMPP().equals(condition))
-				return conflict;
-			else if (feature_not_implemented.toXMPP().equals(condition))
-				return feature_not_implemented;
-			else if (forbidden.toXMPP().equals(condition))
-				return forbidden;
-			else if (gone.toXMPP().equals(condition))
-				return gone;
-			else if (internal_server_error.toXMPP().equals(condition))
-				return internal_server_error;
-			else if (item_not_found.toXMPP().equals(condition))
-				return item_not_found;
-			else if (jid_malformed.toXMPP().equals(condition))
-				return jid_malformed;
-			else if (not_acceptable.toXMPP().equals(condition))
-				return not_acceptable;
-			else if (not_allowed.toXMPP().equals(condition))
-				return not_allowed;
-			else if (not_authorized.toXMPP().equals(condition))
-				return not_authorized;
-			else if (payment_required.toXMPP().equals(condition))
-				return payment_required;
-			else if (recipient_unavailable.toXMPP().equals(condition))
-				return recipient_unavailable;
-			else if (redirect.toXMPP().equals(condition))
-				return redirect;
-			else if (registration_required.toXMPP().equals(condition))
-				return registration_required;
-			else if (remote_server_not_found.toXMPP().equals(condition))
-				return remote_server_not_found;
-			else if (remote_server_timeout.toXMPP().equals(condition))
-				return remote_server_timeout;
-			else if (resource_constraint.toXMPP().equals(condition))
-				return resource_constraint;
-			else if (service_unavailable.toXMPP().equals(condition))
-				return service_unavailable;
-			else if (subscription_required.toXMPP().equals(condition))
-				return subscription_required;
-			else if (undefined_condition.toXMPP().equals(condition))
-				return undefined_condition;
-			else if (unexpected_request.toXMPP().equals(condition))
-				return unexpected_request;
-			else
-				throw new IllegalArgumentException("Condition invalid:" + condition);
+		public final static Condition fromXMPP(String condition) {
+			return valueOf(condition.replace("-", "_"));
 		}
 
-		public static Condition fromLegacyCode(final int code) {
-			if (bad_request.getLegacyCode() == code)
-				return bad_request;
-			else if (conflict.getLegacyCode() == code)
-				return conflict;
-			else if (feature_not_implemented.getLegacyCode() == code)
-				return feature_not_implemented;
-			else if (forbidden.getLegacyCode() == code)
-				return forbidden;
-			else if (gone.getLegacyCode() == code)
-				return gone;
-			else if (internal_server_error.getLegacyCode() == code)
-				return internal_server_error;
-			else if (item_not_found.getLegacyCode() == code)
-				return item_not_found;
-			else if (jid_malformed.getLegacyCode() == code)
-				return jid_malformed;
-			else if (not_acceptable.getLegacyCode() == code)
-				return not_acceptable;
-			else if (not_allowed.getLegacyCode() == code)
-				return not_allowed;
-			else if (not_authorized.getLegacyCode() == code)
-				return not_authorized;
-			else if (payment_required.getLegacyCode() == code)
-				return payment_required;
-			else if (recipient_unavailable.getLegacyCode() == code)
-				return recipient_unavailable;
-			else if (redirect.getLegacyCode() == code)
-				return redirect;
-			else if (registration_required.getLegacyCode() == code)
-				return registration_required;
-			else if (remote_server_not_found.getLegacyCode() == code)
-				return remote_server_not_found;
-			else if (remote_server_timeout.getLegacyCode() == code)
-				return remote_server_timeout;
-			else if (resource_constraint.getLegacyCode() == code)
-				return resource_constraint;
-			else if (service_unavailable.getLegacyCode() == code)
-				return service_unavailable;
-			else if (subscription_required.getLegacyCode() == code)
-				return subscription_required;
-			else if (undefined_condition.getLegacyCode() == code)
-				return undefined_condition;
-			else if (unexpected_request.getLegacyCode() == code)
-				return unexpected_request;
-			else
-				throw new IllegalArgumentException("Code invalid:" + code);
+		public final static Condition fromLegacyCode(final int code) {
+			for (Condition condition : values()) {
+				if (condition.getLegacyCode() == code)
+					return condition;
+			}
+			
+			throw new IllegalArgumentException("Invalid code: " + code);
 		}
 
-		private String value;
-		private int code;
-		private Type defaultType;
+		private final Type defaultType;
+		private final int legacyCode;
 
-		private Condition(final String value, final Type defaultType, final int code) {
-			this.value = value;
+		private Condition(final Type defaultType, final int legacyCode) {
 			this.defaultType = defaultType;
-			this.code = code;
+			this.legacyCode = legacyCode;
 		}
 
 		/**
@@ -585,7 +495,7 @@ public class PacketError extends BaseXML {
 		 * 
 		 * @return the default error type.
 		 */
-		public Type getDefaultType() {
+		public final Type getDefaultType() {
 			return defaultType;
 		}
 
@@ -600,8 +510,8 @@ public class PacketError extends BaseXML {
 		 * @see <a href="http://xmpp.org/extensions/xep-0086.html">XEP-0086:
 		 *      Error Condition Mappings</a>
 		 */
-		public int getLegacyCode() {
-			return code;
+		public final int getLegacyCode() {
+			return legacyCode;
 		}
 
 		/**
@@ -609,8 +519,9 @@ public class PacketError extends BaseXML {
 		 * 
 		 * @return the XMPP error code value.
 		 */
-		public String toXMPP() {
-			return value;
+		@Override
+		public final String toString() {
+			return super.toString().replace("_", "-");
 		}
 	}
 
@@ -641,29 +552,29 @@ public class PacketError extends BaseXML {
 		/**
 		 * Do not retry (the error is unrecoverable).
 		 */
-		cancel("cancel"),
+		cancel,
 
 		/**
 		 * Proceed (the condition was only a warning). This represents the
 		 * "continue" error code in XMPP; because "continue" is a reserved
 		 * keyword in Java the enum name has been changed.
 		 */
-		continue_processing("continue"),
+		continue_processing,
 
 		/**
 		 * Retry after changing the data sent.
 		 */
-		modify("modify"),
+		modify,
 
 		/**
 		 * Retry after providing credentials.
 		 */
-		auth("auth"),
+		auth,
 
 		/**
 		 * Retry after waiting (the error is temporary).
 		 */
-		wait("wait");
+		wait;
 
 		/**
 		 * Converts a String value into its Type representation.
@@ -672,28 +583,11 @@ public class PacketError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public static Type fromXMPP(String type) {
-			if (type == null)
-				throw new NullPointerException();
-			type = type.toLowerCase();
-			if (cancel.toXMPP().equals(type))
-				return cancel;
-			else if (continue_processing.toXMPP().equals(type))
+		public final static Type fromXMPP(String type) {
+			if (type != null && type.equals("continue"))
 				return continue_processing;
-			else if (modify.toXMPP().equals(type))
-				return modify;
-			else if (auth.toXMPP().equals(type))
-				return auth;
-			else if (wait.toXMPP().equals(type))
-				return wait;
-			else
-				throw new IllegalArgumentException("Type invalid:" + type);
-		}
-
-		private String value;
-
-		private Type(final String value) {
-			this.value = value;
+			
+			return valueOf(type);
 		}
 
 		/**
@@ -701,8 +595,12 @@ public class PacketError extends BaseXML {
 		 * 
 		 * @return the XMPP error code value.
 		 */
-		public String toXMPP() {
-			return value;
+		@Override
+		public final String toString() {
+			if (this == continue_processing)
+				return "continue";
+			
+			return super.toString();
 		}
 	}
 }

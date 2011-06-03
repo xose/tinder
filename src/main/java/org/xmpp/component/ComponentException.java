@@ -51,7 +51,7 @@ public class ComponentException extends Exception {
 	}
 
 	public ComponentException(final StreamError streamError) {
-		super(streamError.getCondition().toXMPP());
+		super(streamError.getCondition().toString());
 		this.streamError = streamError;
 	}
 

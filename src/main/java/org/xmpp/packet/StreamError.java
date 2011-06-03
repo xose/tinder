@@ -115,7 +115,7 @@ public class StreamError extends BaseXML {
 			}
 		}
 
-		addChildElement(element, condition.toXMPP(), ERROR_NAMESPACE);
+		addChildElement(element, condition.toString(), ERROR_NAMESPACE);
 	}
 
 	/**
@@ -184,52 +184,52 @@ public class StreamError extends BaseXML {
 		 * &lt;xml-not-well-formed/&gt;, although the more specific errors are
 		 * preferred.
 		 */
-		bad_format("bad-format"),
+		bad_format,
 
 		/**
 		 * The entity has sent a namespace prefix that is unsupported, or has
 		 * sent no namespace prefix on an element that requires such a prefix.
 		 */
-		bad_namespace_prefix("bad-namespace-prefix"),
+		bad_namespace_prefix,
 
 		/**
 		 * The server is closing the active stream for this entity because a new
 		 * stream has been initiated that conflicts with the existing stream.
 		 */
-		conflict("conflict"),
+		conflict,
 
 		/**
 		 * The entity has not generated any traffic over the stream for some
 		 * period of time (configurable according to a local service policy).
 		 */
-		connection_timeout("connection-timeout"),
+		connection_timeout,
 
 		/**
 		 * The value of the 'to' attribute provided by the initiating entity in
 		 * the stream header corresponds to a hostname that is no longer hosted
 		 * by the server.
 		 */
-		host_gone("host-gone"),
+		host_gone,
 
 		/**
 		 * The value of the 'to' attribute provided by the initiating entity in
 		 * the stream header does not correspond to a hostname that is hosted by
 		 * the server.
 		 */
-		host_unknown("host-unknown"),
+		host_unknown,
 
 		/**
 		 * A stanza sent between two servers lacks a 'to' or 'from' attribute
 		 * (or the attribute has no value).
 		 */
-		improper_addressing("improper-addressing"),
+		improper_addressing,
 
 		/**
 		 * The server has experienced a misconfiguration or an
 		 * otherwise-undefined internal error that prevents it from servicing
 		 * the stream.
 		 */
-		internal_server_error("internal-server-error"),
+		internal_server_error,
 
 		/**
 		 * The JID or hostname provided in a 'from' address does not match an
@@ -237,26 +237,26 @@ public class StreamError extends BaseXML {
 		 * SASL or dialback, or between a client and a server via authentication
 		 * and resource binding.
 		 */
-		invalid_from("invalid-from"),
+		invalid_from,
 
 		/**
 		 * The stream ID or dialback ID is invalid or does not match an ID
 		 * previously provided.
 		 */
-		invalid_id("invalid-id"),
+		invalid_id,
 
 		/**
 		 * the streams namespace name is something other than
 		 * "http://etherx.jabber.org/streams" or the dialback namespace name is
 		 * something other than "jabber:server:dialback".
 		 */
-		invalid_namespace("invalid-namespace"),
+		invalid_namespace,
 
 		/**
 		 * The entity has sent invalid XML over the stream to a server that
 		 * performs validation.
 		 */
-		invalid_xml("invalid-xml"),
+		invalid_xml,
 
 		/**
 		 * The entity has attempted to send data before the stream has been
@@ -264,33 +264,33 @@ public class StreamError extends BaseXML {
 		 * related to stream negotiation; the receiving entity MUST NOT process
 		 * the offending stanza before sending the stream error.
 		 */
-		not_authorized("not-authorized"),
+		not_authorized,
 
 		/**
 		 * The entity has violated some local service policy; the server MAY
 		 * choose to specify the policy in the <text/> element or an
 		 * application-specific condition element.
 		 */
-		policy_violation("policy-violation"),
+		policy_violation,
 
 		/**
 		 * The server is unable to properly connect to a remote entity that is
 		 * required for authentication or authorization.
 		 */
-		remote_connection_failed("remote-connection-failed"),
+		remote_connection_failed,
 
 		/**
 		 * The server lacks the system resources necessary to service the
 		 * stream.
 		 */
-		resource_constraint("resource-constraint"),
+		resource_constraint,
 
 		/**
 		 * The entity has attempted to send restricted XML features such as a
 		 * comment, processing instruction, DTD, entity reference, or unescaped
 		 * character.
 		 */
-		restricted_xml("restricted-xml"),
+		restricted_xml,
 
 		/**
 		 * The server will not provide service to the initiating entity but is
@@ -299,32 +299,32 @@ public class StreamError extends BaseXML {
 		 * identifier) as the XML character data of the &lt;see-other-host/&gt;
 		 * element.
 		 */
-		see_other_host("see-other-host"),
+		see_other_host,
 
 		/**
 		 * The server is being shut down and all active streams are being
 		 * closed.
 		 */
-		system_shutdown("system-shutdown"),
+		system_shutdown,
 
 		/**
 		 * The error condition is not one of those defined by the other
 		 * conditions in this list; this error condition SHOULD be used only in
 		 * conjunction with an application-specific condition.
 		 */
-		undefined_condition("undefined-condition"),
+		undefined_condition,
 
 		/**
 		 * The initiating entity has encoded the stream in an encoding that is
 		 * not supported by the server.
 		 */
-		unsupported_encoding("unsupported-encoding"),
+		unsupported_encoding,
 
 		/**
 		 * The initiating entity has sent a first-level child of the stream that
 		 * is not supported by the server.
 		 */
-		unsupported_stanza_type("unsupported-stanza-type"),
+		unsupported_stanza_type,
 
 		/**
 		 * the value of the 'version' attribute provided by the initiating
@@ -332,12 +332,12 @@ public class StreamError extends BaseXML {
 		 * supported by the server; the server MAY specify the version(s) it
 		 * supports in the &lt;text/&gt; element.
 		 */
-		unsupported_version("unsupported-version"),
+		unsupported_version,
 
 		/**
 		 * The initiating entity has sent XML that is not well-formed.
 		 */
-		xml_not_well_formed("xml-not-well-formed");
+		xml_not_well_formed;
 
 		/**
 		 * Converts a String value into its Condition representation.
@@ -346,66 +346,8 @@ public class StreamError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public static Condition fromXMPP(String condition) {
-			if (condition == null)
-				throw new NullPointerException();
-			condition = condition.toLowerCase();
-			if (bad_format.toXMPP().equals(condition))
-				return bad_format;
-			else if (bad_namespace_prefix.toXMPP().equals(condition))
-				return bad_namespace_prefix;
-			else if (conflict.toXMPP().equals(condition))
-				return conflict;
-			else if (connection_timeout.toXMPP().equals(condition))
-				return connection_timeout;
-			else if (host_gone.toXMPP().equals(condition))
-				return host_gone;
-			else if (host_unknown.toXMPP().equals(condition))
-				return host_unknown;
-			else if (improper_addressing.toXMPP().equals(condition))
-				return improper_addressing;
-			else if (internal_server_error.toXMPP().equals(condition))
-				return internal_server_error;
-			else if (invalid_from.toXMPP().equals(condition))
-				return invalid_from;
-			else if (invalid_id.toXMPP().equals(condition))
-				return invalid_id;
-			else if (invalid_namespace.toXMPP().equals(condition))
-				return invalid_namespace;
-			else if (invalid_xml.toXMPP().equals(condition))
-				return invalid_xml;
-			else if (not_authorized.toXMPP().equals(condition))
-				return not_authorized;
-			else if (policy_violation.toXMPP().equals(condition))
-				return policy_violation;
-			else if (remote_connection_failed.toXMPP().equals(condition))
-				return remote_connection_failed;
-			else if (resource_constraint.toXMPP().equals(condition))
-				return resource_constraint;
-			else if (restricted_xml.toXMPP().equals(condition))
-				return restricted_xml;
-			else if (see_other_host.toXMPP().equals(condition))
-				return see_other_host;
-			else if (system_shutdown.toXMPP().equals(condition))
-				return system_shutdown;
-			else if (undefined_condition.toXMPP().equals(condition))
-				return undefined_condition;
-			else if (unsupported_encoding.toXMPP().equals(condition))
-				return unsupported_encoding;
-			else if (unsupported_stanza_type.toXMPP().equals(condition))
-				return unsupported_stanza_type;
-			else if (unsupported_version.toXMPP().equals(condition))
-				return unsupported_version;
-			else if (xml_not_well_formed.toXMPP().equals(condition))
-				return xml_not_well_formed;
-			else
-				throw new IllegalArgumentException("Condition invalid:" + condition);
-		}
-
-		private String value;
-
-		private Condition(final String value) {
-			this.value = value;
+		public final static Condition fromXMPP(String condition) {
+			return valueOf(condition.replace("-", "_"));
 		}
 
 		/**
@@ -413,8 +355,9 @@ public class StreamError extends BaseXML {
 		 * 
 		 * @return the XMPP error code value.
 		 */
-		public String toXMPP() {
-			return value;
+		@Override
+		public final String toString() {
+			return super.toString().replace("_", "-");
 		}
 	}
 }
