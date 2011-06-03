@@ -16,8 +16,6 @@
 
 package org.xmpp.packet;
 
-import java.util.Iterator;
-
 import net.jcip.annotations.NotThreadSafe;
 
 import org.w3c.dom.Element;
@@ -90,13 +88,12 @@ public class StreamError extends BaseXML {
 	 * @return the error condition.
 	 * @see Condition
 	 */
-	@SuppressWarnings("unchecked")
 	public Condition getCondition() {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (el.getNamespaceURI().equals(ERROR_NAMESPACE) && !el.getName().equals("text"))
-				return Condition.fromXMPP(el.getName());
+		for (final Element el : getChildElements(element)) {
+			if (ERROR_NAMESPACE.equals(el.getNamespaceURI()) && !el.getTagName().equals("text"))
+				return Condition.fromXMPP(el.getTagName());
 		}
+
 		return null;
 	}
 
@@ -107,23 +104,18 @@ public class StreamError extends BaseXML {
 	 *            the error condition.
 	 * @see Condition
 	 */
-	@SuppressWarnings("unchecked")
 	public void setCondition(final Condition condition) {
 		if (condition == null)
 			throw new NullPointerException("Condition cannot be null");
-		Element conditionElement = null;
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (el.getNamespaceURI().equals(ERROR_NAMESPACE) && !el.getName().equals("text")) {
-				conditionElement = el;
+
+		// Delete current condition.
+		for (final Element el : getChildElements(element)) {
+			if (ERROR_NAMESPACE.equals(el.getNamespaceURI()) && !el.getTagName().equals("text")) {
+				element.removeChild(element);
 			}
 		}
-		if (conditionElement != null) {
-			element.remove(conditionElement);
-		}
 
-		conditionElement = docFactory.createElement(condition.toXMPP(), ERROR_NAMESPACE);
-		element.add(conditionElement);
+		addChildElement(element, condition.toXMPP(), ERROR_NAMESPACE);
 	}
 
 	/**
@@ -143,7 +135,7 @@ public class StreamError extends BaseXML {
 	 *            the text description of the error.
 	 */
 	public void setText(final String text) {
-		setText(text, null);
+		setChildElementText(element, "text", text);
 	}
 
 	/**
@@ -152,28 +144,13 @@ public class StreamError extends BaseXML {
 	 * 
 	 * @param text
 	 *            the text description of the error.
-	 * @param language
+	 * @param lang
 	 *            the language code of the description, or <tt>null</tt> to
 	 *            specify no language code.
 	 */
-	public void setText(final String text, final String language) {
-		Element textElement = element.element("text");
-		// If text is null, clear the text.
-		if (text == null) {
-			if (textElement != null) {
-				element.remove(textElement);
-			}
-			return;
-		}
-
-		if (textElement == null) {
-			textElement = docFactory.createElement("text", ERROR_NAMESPACE);
-			if (language != null) {
-				textElement.addAttribute(QName.get("lang", "xml", "http://www.w3.org/XML/1998/namespace"), language);
-			}
-			element.add(textElement);
-		}
-		textElement.setText(text);
+	public void setText(final String text, final String lang) {
+		setChildElementText(element, "text", text);
+		setChildElementLang(element, "text", lang);
 	}
 
 	/**
@@ -182,11 +159,8 @@ public class StreamError extends BaseXML {
 	 * 
 	 * @return the language code of the text description, if it exists.
 	 */
-	public String getTextLanguage() {
-		final Element textElement = element.element("text");
-		if (textElement != null)
-			return textElement.attributeValue(QName.get("lang", "xml", "http://www.w3.org/XML/1998/namespace"));
-		return null;
+	public String getTextLang() {
+		return getChildElementLang(element, "text");
 	}
 
 	/**

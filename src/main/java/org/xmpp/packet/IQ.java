@@ -21,7 +21,6 @@ import java.util.Random;
 import net.jcip.annotations.NotThreadSafe;
 
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 /**
  * IQ (Info/Query) packet. IQ packets are used to get and set information on the
@@ -144,16 +143,11 @@ public class IQ extends Packet {
 	 * @return the child element.
 	 */
 	public Element getIQChildElement() {
-		final NodeList elements = element.getChildNodes();
-		if (elements.getLength() == 0)
-			return null;
-
 		// Search for a child element that is in a different namespace.
-		for (int i = 0; i < elements.getLength(); i++) {
-			final Element element = (Element) elements.item(i);
-			final String namespace = element.getNamespaceURI();
+		for (final Element child : getChildElements(element)) {
+			final String namespace = child.getNamespaceURI();
 			if (namespace != null && !namespace.equals("jabber:client") && !namespace.equals("jabber:server"))
-				return element;
+				return child;
 		}
 		return null;
 	}
@@ -223,7 +217,6 @@ public class IQ extends Packet {
 		final Element childElement = element.getOwnerDocument().createElementNS(namespaceURI, qualifiedName);
 		setIQChildElement(childElement);
 		return childElement;
-
 	}
 
 	/**

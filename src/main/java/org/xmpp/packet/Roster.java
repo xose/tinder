@@ -19,7 +19,6 @@ package org.xmpp.packet;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 
 import net.jcip.annotations.NotThreadSafe;
 
@@ -54,7 +53,7 @@ public class Roster extends IQ {
 	 */
 	public Roster(final Type type) {
 		super(type);
-		addChildElement(element, "query", "jabber:iq:roster");
+		setIQChildElement("query", "jabber:iq:roster");
 	}
 
 	/**
@@ -67,7 +66,7 @@ public class Roster extends IQ {
 	 */
 	public Roster(final Type type, final String ID) {
 		super(type, ID);
-		element.addElement("query", "jabber:iq:roster");
+		setIQChildElement("query", "jabber:iq:roster");
 	}
 
 	/**
@@ -79,32 +78,6 @@ public class Roster extends IQ {
 	 */
 	public Roster(final Element element) {
 		super(element);
-	}
-
-	/**
-	 * Adds a new item to the roster. The name and groups are set to
-	 * <tt>null</tt> If the roster packet already contains an item using the
-	 * same JID, the information in the existing item will be overwritten with
-	 * the new information.
-	 * <p>
-	 * 
-	 * The XMPP specification recommends that if the roster item is associated
-	 * with another instant messaging user (human), that the JID be in bare form
-	 * (e.g. user@domain). Use the {@link JID#toBareJID() toBareJID()} method
-	 * for a bare JID.
-	 * 
-	 * @param jid
-	 *            the JID.
-	 * @param subscription
-	 *            the subscription type.
-	 * @return the newly created item.
-	 */
-	public Item addItem(final String jid, final Subscription subscription) {
-		if (getType() == IQ.Type.get || getType() == IQ.Type.error)
-			throw new IllegalStateException("IQ type must be 'result' or 'set'");
-		if (jid == null)
-			throw new NullPointerException("JID cannot be null");
-		return addItem(new JID(jid), null, null, subscription, null);
 	}
 
 	/**
@@ -156,40 +129,42 @@ public class Roster extends IQ {
 	 *            a Collection of groups.
 	 * @return the newly created item.
 	 */
-	@SuppressWarnings("unchecked")
 	public Item addItem(final JID jid, final String name, final Ask ask, final Subscription subscription, final Collection<String> groups) {
 		if (jid == null)
 			throw new NullPointerException("JID cannot be null");
 		if (subscription == null)
 			throw new NullPointerException("Subscription cannot be null");
-		Element query = element.element(new QName("query", Namespace.get("jabber:iq:roster")));
+
+		Element query = getIQChildElement();
 		if (query == null) {
-			query = element.addElement("query", "jabber:iq:roster");
+			query = setIQChildElement("query", "jabber:iq:roster");
 		}
+
 		Element item = null;
-		for (final Iterator<Element> i = query.elementIterator("item"); i.hasNext();) {
-			final Element el = i.next();
-			if (el.attributeValue("jid").equals(jid.toString())) {
+		for (final Element el : getChildElements(query, "item")) {
+			if (el.getAttribute("jid").equals(jid.toString())) {
 				item = el;
+				break;
 			}
 		}
 		if (item == null) {
-			item = query.addElement("item");
+			item = addChildElement(query, "item");
 		}
-		item.addAttribute("jid", jid.toBareJID());
-		item.addAttribute("name", name);
+
+		item.setAttribute("jid", jid.toBareJID());
+		item.setAttribute("name", name);
 		if (ask != null) {
-			item.addAttribute("ask", ask.toString());
+			item.setAttribute("ask", ask.toString());
 		}
-		item.addAttribute("subscription", subscription.toString());
+		item.setAttribute("subscription", subscription.toString());
 		// Erase existing groups in case the item previously existed.
-		for (final Iterator<Element> i = item.elementIterator("group"); i.hasNext();) {
-			item.remove(i.next());
+		for (final Element group : getChildElements(item, "group")) {
+			item.removeChild(group);
 		}
 		// Add in groups.
 		if (groups != null) {
 			for (final String group : groups) {
-				item.addElement("group").setText(group);
+				setChildElementText(item, "group", group);
 			}
 		}
 		return new Item(jid, name, ask, subscription, groups);
@@ -201,14 +176,12 @@ public class Roster extends IQ {
 	 * @param jid
 	 *            the JID of the item to remove.
 	 */
-	@SuppressWarnings("unchecked")
 	public void removeItem(final JID jid) {
-		final Element query = element.element(new QName("query", Namespace.get("jabber:iq:roster")));
+		final Element query = getIQChildElement();
 		if (query != null) {
-			for (final Iterator<Element> i = query.elementIterator("item"); i.hasNext();) {
-				final Element item = i.next();
-				if (item.attributeValue("jid").equals(jid.toString())) {
-					query.remove(item);
+			for (final Element item : getChildElements(query, "item")) {
+				if (item.getAttribute("jid").equals(jid.toString())) {
+					query.removeChild(item);
 					return;
 				}
 			}
@@ -222,27 +195,28 @@ public class Roster extends IQ {
 	 * @return an unmodifable copy of the {@link Item Items} in the roster
 	 *         packet.
 	 */
-	@SuppressWarnings("unchecked")
 	public Collection<Item> getItems() {
 		final Collection<Item> items = new ArrayList<Item>();
-		final Element query = element.element(new QName("query", Namespace.get("jabber:iq:roster")));
+
+		final Element query = getIQChildElement();
 		if (query != null) {
-			for (final Iterator<Element> i = query.elementIterator("item"); i.hasNext();) {
-				final Element item = i.next();
-				final String jid = item.attributeValue("jid");
-				final String name = item.attributeValue("name");
-				final String ask = item.attributeValue("ask");
-				final String subscription = item.attributeValue("subscription");
+			for (final Element item : getChildElements(query, "item")) {
+				final String jid = item.getAttribute("jid");
+				final String name = item.getAttribute("name");
+				final String ask = item.getAttribute("ask");
+				final String subscription = item.getAttribute("subscription");
 				final Collection<String> groups = new ArrayList<String>();
-				for (final Iterator<Element> j = item.elementIterator("group"); j.hasNext();) {
-					final Element group = j.next();
-					groups.add(group.getText().trim());
+
+				for (final Element group : getChildElements(item, "group")) {
+					groups.add(group.getTextContent().trim());
 				}
-				final Ask askStatus = ask == null ? null : Ask.valueOf(ask);
+
+				final Ask askStatus = ask != null ? Ask.valueOf(ask) : null;
 				final Subscription subStatus = subscription == null ? null : Subscription.valueOf(subscription);
 				items.add(new Item(new JID(jid), name, askStatus, subStatus, groups));
 			}
 		}
+
 		return Collections.unmodifiableCollection(items);
 	}
 
@@ -288,7 +262,7 @@ public class Roster extends IQ {
 		 * 
 		 * @return the JID associated with this item.
 		 */
-		public JID getJID() {
+		public final JID getJID() {
 			return jid;
 		}
 
@@ -298,7 +272,7 @@ public class Roster extends IQ {
 		 * 
 		 * @return the nickname, or <tt>null</tt> if it doesn't exist.
 		 */
-		public String getName() {
+		public final String getName() {
 			return name;
 		}
 
@@ -307,7 +281,7 @@ public class Roster extends IQ {
 		 * 
 		 * @return the ask state of this item.
 		 */
-		public Ask getAsk() {
+		public final Ask getAsk() {
 			return ask;
 		}
 
@@ -316,7 +290,7 @@ public class Roster extends IQ {
 		 * 
 		 * @return the subscription state of this item.
 		 */
-		public Subscription getSubscription() {
+		public final Subscription getSubscription() {
 			return subscription;
 		}
 
@@ -326,14 +300,14 @@ public class Roster extends IQ {
 		 * 
 		 * @return the groups in this item.
 		 */
-		public Collection<String> getGroups() {
+		public final Collection<String> getGroups() {
 			if (groups == null)
 				return Collections.emptyList();
 			return groups;
 		}
 
 		@Override
-		public String toString() {
+		public final String toString() {
 			final StringBuffer buf = new StringBuffer();
 			buf.append("<item ");
 			buf.append("jid=\"").append(jid).append("\"");

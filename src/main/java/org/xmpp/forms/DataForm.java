@@ -123,7 +123,7 @@ public class DataForm extends PacketExtension {
 	public DataForm(final Type type) {
 		super(ELEMENT_NAME, NAMESPACE);
 		// Set the type of the data form
-		element.addAttribute("type", type.toString());
+		element.setAttribute("type", type.toString());
 	}
 
 	public DataForm(final Element element) {
@@ -370,11 +370,6 @@ public class DataForm extends PacketExtension {
 				field.addElement("value").setText(encode(value));
 			}
 		}
-	}
-
-	@Override
-	public DataForm createCopy() {
-		return new DataForm(getElement().createCopy());
 	}
 
 	/**

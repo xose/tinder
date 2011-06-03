@@ -16,11 +16,6 @@
 
 package org.xmpp.packet;
 
-import java.util.Iterator;
-
-import javax.xml.XMLConstants;
-import javax.xml.namespace.QName;
-
 import net.jcip.annotations.NotThreadSafe;
 
 import org.w3c.dom.Element;
@@ -111,9 +106,9 @@ public class PacketError extends BaseXML {
 	 * @see Type
 	 */
 	public final Type getType() {
-		final String type = element.getAttribute("type");
+		final String type = getAttribute(element, "type");
 
-		return !type.isEmpty() ? Type.fromXMPP(type) : null;
+		return type != null ? Type.fromXMPP(type) : null;
 	}
 
 	/**
@@ -124,11 +119,7 @@ public class PacketError extends BaseXML {
 	 * @see Type
 	 */
 	public final void setType(final Type type) {
-		if (type != null) {
-			element.setAttribute("type", type.toXMPP());
-		} else {
-			element.removeAttribute("type");
-		}
+		setAttribute(element, "type", type.toXMPP());
 	}
 
 	/**
@@ -137,24 +128,22 @@ public class PacketError extends BaseXML {
 	 * @return the error condition.
 	 * @see Condition
 	 */
-	@SuppressWarnings("unchecked")
 	public Condition getCondition() {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (el.getNamespaceURI().equals(ERROR_NAMESPACE) && !el.getName().equals("text"))
-				return Condition.fromXMPP(el.getName());
+		for (final Element el : getChildElements(element)) {
+			if (ERROR_NAMESPACE.equals(el.getNamespaceURI()) && !el.getTagName().equals("text"))
+				return Condition.fromXMPP(el.getTagName());
 		}
+
 		// Looking for XMPP condition failed. See if a legacy error code exists,
 		// which can be mapped into an XMPP error condition.
-		final String code = element.attributeValue("code");
-		if (code != null) {
-			try {
-				return Condition.fromLegacyCode(Integer.parseInt(code));
-			} catch (final Exception e) {
-				// Ignore -- unable to map legacy code into a valid condition
-				// so return null.
-			}
+		try {
+			final String code = getAttribute(element, "code");
+			return Condition.fromLegacyCode(Integer.parseInt(code));
+		} catch (final Exception e) {
+			// Ignore -- unable to map legacy code into a valid condition so
+			// return null.
 		}
+
 		return null;
 	}
 
@@ -165,26 +154,21 @@ public class PacketError extends BaseXML {
 	 *            the error condition.
 	 * @see Condition
 	 */
-	@SuppressWarnings("unchecked")
 	public void setCondition(final Condition condition) {
 		if (condition == null)
 			throw new NullPointerException("Condition cannot be null");
-		// Set the error code for legacy support.
-		element.addAttribute("code", Integer.toString(condition.getLegacyCode()));
 
-		Element conditionElement = null;
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (el.getNamespaceURI().equals(ERROR_NAMESPACE) && !el.getName().equals("text")) {
-				conditionElement = el;
+		// Set the error code for legacy support.
+		element.setAttribute("code", Integer.toString(condition.getLegacyCode()));
+
+		// Delete current condition.
+		for (final Element el : getChildElements(element)) {
+			if (ERROR_NAMESPACE.equals(el.getNamespaceURI()) && !el.getTagName().equals("text")) {
+				element.removeChild(element);
 			}
 		}
-		if (conditionElement != null) {
-			element.remove(conditionElement);
-		}
 
-		conditionElement = docFactory.createElement(condition.toXMPP(), ERROR_NAMESPACE);
-		element.add(conditionElement);
+		addChildElement(element, condition.toXMPP(), ERROR_NAMESPACE);
 	}
 
 	/**
@@ -194,7 +178,7 @@ public class PacketError extends BaseXML {
 	 * @return the text description of the error.
 	 */
 	public String getText() {
-		return element.elementText("text");
+		return getChildElementText(element, "text");
 	}
 
 	/**
@@ -204,7 +188,7 @@ public class PacketError extends BaseXML {
 	 *            the text description of the error.
 	 */
 	public void setText(final String text) {
-		setText(text, null);
+		setChildElementText(element, "text", text);
 	}
 
 	/**
@@ -218,24 +202,8 @@ public class PacketError extends BaseXML {
 	 *            specify no language code.
 	 */
 	public void setText(final String text, final String lang) {
-		final Element textElement = (Element) element.getElementsByTagName("text").item(0);
-		// If text is null, clear the text.
-		if (text == null) {
-			if (textElement != null) {
-				element.removeChild(textElement);
-			}
-			return;
-		}
-
-		if (textElement == null) {
-			textElement = docFactory.createElement("text", ERROR_NAMESPACE);
-			if (lang != null) {
-				textElement.addAttribute(QName.get("lang", "xml", "http://www.w3.org/XML/1998/namespace"), lang);
-			}
-			element.add(textElement);
-		}
-
-		textElement.setTextContent(text);
+		setChildElementText(element, "text", text);
+		setChildElementLang(element, "text", lang);
 	}
 
 	/**
@@ -245,9 +213,7 @@ public class PacketError extends BaseXML {
 	 * @return the language code of the text description, if it exists.
 	 */
 	public String getTextLang() {
-		final Element textElement = (Element) element.getElementsByTagName("text").item(0);
-
-		return textElement != null ? textElement.getAttributeNS(XMLConstants.XML_NS_URI, "xml:lang") : null;
+		return getChildElementLang(element, "text");
 	}
 
 	/**
@@ -270,34 +236,22 @@ public class PacketError extends BaseXML {
 	 * @param namespaceURI
 	 *            the namespace of the application.
 	 */
-	@SuppressWarnings("unchecked")
-	public void setApplicationCondition(final String name, String namespaceURI) {
+	public void setApplicationCondition(final String name, final String namespaceURI) {
 		if (ERROR_NAMESPACE.equals(namespaceURI))
 			throw new IllegalArgumentException();
 
-		Element applicationError = null;
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-
-			final Element el = i.next();
-			if (!el.getNamespaceURI().equals(ERROR_NAMESPACE)) {
-				applicationError = el;
+		// Delete current condition.
+		for (final Element el : getChildElements(element)) {
+			if (!ERROR_NAMESPACE.equals(el.getNamespaceURI())) {
+				element.removeChild(element);
 			}
-		}
-
-		if (applicationError != null) {
-			element.remove(applicationError);
 		}
 
 		// If name is null, clear the application condition.
 		if (name == null)
 			return;
 
-		if (namespaceURI == null) {
-			// Set fallback namespace (see XEP-0182)
-			namespaceURI = "urn:xmpp:errors";
-		}
-		applicationError = docFactory.createElement(name, namespaceURI);
-		element.add(applicationError);
+		addChildElement(element, name, namespaceURI != null ? namespaceURI : "urn:xmpp:errors");
 	}
 
 	/**
@@ -307,13 +261,12 @@ public class PacketError extends BaseXML {
 	 * @return the name of the application-specific error condition, if it
 	 *         exists.
 	 */
-	@SuppressWarnings("unchecked")
 	public String getApplicationConditionName() {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (!el.getNamespaceURI().equals(ERROR_NAMESPACE))
-				return el.getName();
+		for (final Element el : getChildElements(element)) {
+			if (!ERROR_NAMESPACE.equals(el.getNamespaceURI()))
+				return el.getTagName();
 		}
+
 		return null;
 	}
 
@@ -324,11 +277,9 @@ public class PacketError extends BaseXML {
 	 * @return the namespace of the application-specific error condition, if it
 	 *         exists.
 	 */
-	@SuppressWarnings("unchecked")
 	public String getApplicationConditionNamespaceURI() {
-		for (final Iterator<Element> i = element.elementIterator(); i.hasNext();) {
-			final Element el = i.next();
-			if (!el.getNamespaceURI().equals(ERROR_NAMESPACE))
+		for (final Element el : getChildElements(element)) {
+			if (!ERROR_NAMESPACE.equals(el.getNamespaceURI()))
 				return el.getNamespaceURI();
 		}
 		return null;

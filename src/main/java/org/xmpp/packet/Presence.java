@@ -58,6 +58,10 @@ public class Presence extends Packet {
 		setTo(to);
 	}
 
+	public Presence(final Element element) {
+		super(element);
+	}
+
 	/**
 	 * Returns the type of this presence. If the presence is "available", the
 	 * type will be <tt>null</tt> (in XMPP, no value for the type attribute is
@@ -101,10 +105,9 @@ public class Presence extends Packet {
 	 * @see Show
 	 */
 	public Show getShow() {
-		final String show = element.elementText("show");
-		if (show != null)
-			return Show.valueOf(show);
-		return null;
+		final String show = getChildElementText(element, "show");
+
+		return show != null ? Show.valueOf(show) : null;
 	}
 
 	/**
@@ -120,20 +123,10 @@ public class Presence extends Packet {
 	 * @see Show
 	 */
 	public void setShow(final Show show) {
-		Element showElement = element.element("show");
-		// If show is null, clear the subject.
-		if (show == null) {
-			if (showElement != null) {
-				element.remove(showElement);
-			}
-			return;
-		}
-		if (showElement == null) {
-			if (!isAvailable())
-				throw new IllegalArgumentException("Cannot set 'show' if 'type' attribute is set.");
-			showElement = element.addElement("show");
-		}
-		showElement.setText(show.toString());
+		if (getType() != Type.available)
+			throw new IllegalArgumentException("Cannot set 'show' if 'type' attribute is set.");
+
+		setChildElementText(element, "show", show.toString());
 	}
 
 	/**
@@ -143,7 +136,7 @@ public class Presence extends Packet {
 	 * @return the status.
 	 */
 	public String getStatus() {
-		return element.elementText("status");
+		return getChildElementText(element, "status");
 	}
 
 	/**
@@ -154,19 +147,7 @@ public class Presence extends Packet {
 	 *            the status.
 	 */
 	public void setStatus(final String status) {
-		Element statusElement = element.element("status");
-		// If subject is null, clear the subject.
-		if (status == null) {
-			if (statusElement != null) {
-				element.remove(statusElement);
-			}
-			return;
-		}
-
-		if (statusElement == null) {
-			statusElement = element.addElement("status");
-		}
-		statusElement.setText(status);
+		setChildElementText(element, "status", status);
 	}
 
 	/**
@@ -177,12 +158,8 @@ public class Presence extends Packet {
 	 * @return the priority.
 	 */
 	public int getPriority() {
-		final String priority = element.elementText("priority");
-		if (priority == null)
-			return 0;
-
 		try {
-			return Integer.parseInt(priority);
+			return Integer.parseInt(getChildElementText(element, "priority"));
 		} catch (final Exception e) {
 			return 0;
 		}
@@ -199,11 +176,8 @@ public class Presence extends Packet {
 	public void setPriority(final int priority) {
 		if (priority < -128 || priority > 128)
 			throw new IllegalArgumentException("Priority value of " + priority + " is outside the valid range of -128 through 128");
-		Element priorityElement = element.element("priority");
-		if (priorityElement == null) {
-			priorityElement = element.addElement("priority");
-		}
-		priorityElement.setText(Integer.toString(priority));
+
+		setChildElementText(element, "priority", Integer.toString(priority));
 	}
 
 	/**

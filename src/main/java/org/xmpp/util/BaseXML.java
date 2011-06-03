@@ -1,6 +1,7 @@
 package org.xmpp.util;
 
 import java.io.StringWriter;
+import java.util.Iterator;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -15,6 +16,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public abstract class BaseXML implements Cloneable {
 
@@ -67,6 +69,42 @@ public abstract class BaseXML implements Cloneable {
 	protected BaseXML(final Element element) {
 		document = docBuilder.newDocument();
 		this.element = (Element) document.importNode(element, true);
+	}
+
+	protected final static Iterable<Element> getChildElements(final Element element) {
+		return getChildElements(element, "*", "*");
+	}
+
+	protected final static Iterable<Element> getChildElements(final Element element, final String name) {
+		return getChildElements(element, name, XMLConstants.NULL_NS_URI);
+	}
+
+	protected final static Iterable<Element> getChildElements(final Element element, final String localName, final String namespaceURI) {
+		return new Iterable<Element>() {
+
+			@Override
+			public Iterator<Element> iterator() {
+				return new Iterator<Element>() {
+					private final NodeList childList = element.getElementsByTagNameNS(namespaceURI, localName);
+					private int current = 0;
+
+					@Override
+					public boolean hasNext() {
+						return current < childList.getLength();
+					}
+
+					@Override
+					public Element next() {
+						return (Element) childList.item(current++);
+					}
+
+					@Override
+					public void remove() {
+						throw new UnsupportedOperationException();
+					}
+				};
+			}
+		};
 	}
 
 	/**
@@ -193,7 +231,7 @@ public abstract class BaseXML implements Cloneable {
 			return;
 
 		if (childElement == null) {
-			childElement = addChildElement(element, "body");
+			childElement = addChildElement(element, qualifiedName);
 		}
 		childElement.setTextContent(text);
 	}
@@ -266,5 +304,5 @@ public abstract class BaseXML implements Cloneable {
 			throw new InternalError("Transformer error");
 		}
 	}
-	
+
 }
