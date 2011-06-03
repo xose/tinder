@@ -28,9 +28,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.xml.namespace.QName;
-
-import net.jcip.annotations.NotThreadSafe;
 
 import org.jivesoftware.util.FastDateFormat;
 import org.w3c.dom.Element;

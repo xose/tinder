@@ -24,7 +24,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 /**
  * A result set representation as described in XEP-0059. Note that this result

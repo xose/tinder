@@ -19,7 +19,7 @@ package org.xmpp.util;
 import java.io.Serializable;
 import java.util.Map;
 
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 /**
  * A wrapper implementation for cached values, suitable for {@link Map} based

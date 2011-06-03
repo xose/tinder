@@ -18,7 +18,7 @@ package org.xmpp.packet;
 
 import java.util.Random;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.w3c.dom.Element;
 

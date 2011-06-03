@@ -21,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.IDN;
 import java.util.concurrent.ConcurrentMap;
 
-import net.jcip.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 import org.xmpp.util.ValueWrapper;
 import org.xmpp.util.ValueWrapper.Representation;

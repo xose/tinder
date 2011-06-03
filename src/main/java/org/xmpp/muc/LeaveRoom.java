@@ -16,7 +16,7 @@
 
 package org.xmpp.muc;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.xmpp.packet.JID;
 import org.xmpp.packet.Presence;

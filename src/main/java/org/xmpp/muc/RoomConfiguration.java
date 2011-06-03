@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.jcip.annotations.NotThreadSafe;
+import javax.annotation.concurrent.NotThreadSafe;
 
 import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;

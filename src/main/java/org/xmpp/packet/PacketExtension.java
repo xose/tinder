@@ -20,9 +20,8 @@ import java.lang.reflect.Constructor;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.concurrent.NotThreadSafe;
 import javax.xml.namespace.QName;
-
-import net.jcip.annotations.NotThreadSafe;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
