@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,7 +95,7 @@ public class DataForm extends PacketExtension {
 		}
 	}
 
-	public static boolean parseBoolean(final String booleanString) throws ParseException {
+	public static boolean parseBoolean(final String booleanString) {
 		return "1".equals(booleanString) || "true".equals(booleanString);
 	}
 
@@ -135,11 +134,21 @@ public class DataForm extends PacketExtension {
 	 * @return the data form type.
 	 * @see org.xmpp.forms.DataForm.Type
 	 */
-	public DataForm.Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return DataForm.Type.valueOf(type);
-		return null;
+	public Type getType() {
+		final String type = getAttribute(element, "type");
+
+		return type != null ? Type.valueOf(type) : null;
+	}
+
+	/**
+	 * Returns the description of the data form. It is similar to the title on a
+	 * web page or an X window. You can put a <title/> on either a form to fill
+	 * out, or a set of data results.
+	 * 
+	 * @return description of the data.
+	 */
+	public String getTitle() {
+		return getChildElementText(element, "title");
 	}
 
 	/**
@@ -151,22 +160,7 @@ public class DataForm extends PacketExtension {
 	 *            description of the data.
 	 */
 	public void setTitle(final String title) {
-		// Remove an existing title element.
-		if (element.element("title") != null) {
-			element.remove(element.element("title"));
-		}
-		element.addElement("title").setText(title);
-	}
-
-	/**
-	 * Returns the description of the data form. It is similar to the title on a
-	 * web page or an X window. You can put a <title/> on either a form to fill
-	 * out, or a set of data results.
-	 * 
-	 * @return description of the data.
-	 */
-	public String getTitle() {
-		return element.elementTextTrim("title");
+		setChildElementText(element, "title", title);
 	}
 
 	/**
@@ -178,12 +172,13 @@ public class DataForm extends PacketExtension {
 	 * @return an unmodifiable list of instructions that explain how to fill out
 	 *         the form.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<String> getInstructions() {
 		final List<String> answer = new ArrayList<String>();
-		for (final Iterator<Element> it = element.elementIterator("instructions"); it.hasNext();) {
-			answer.add(it.next().getTextTrim());
+
+		for (final Element el : getChildElements(element, "instructions")) {
+			answer.add(el.getTextContent().trim());
 		}
+
 		return Collections.unmodifiableList(answer);
 	}
 
@@ -203,18 +198,45 @@ public class DataForm extends PacketExtension {
 		if (instruction == null || instruction.trim().length() == 0)
 			return;
 
-		element.addElement("instructions").setText(instruction);
+		addChildElement(element, "instructions").setTextContent(instruction);
 	}
 
 	/**
 	 * Clears all the stored instructions in this packet extension.
 	 */
-	@SuppressWarnings("unchecked")
 	public void clearInstructions() {
-		for (final Iterator<Element> it = element.elementIterator("instructions"); it.hasNext();) {
-			it.next();
-			it.remove();
+		for (final Element el : getChildElements(element, "instructions")) {
+			element.removeChild(el);
 		}
+	}
+
+	/**
+	 * Returns the field whose variable matches the specified variable.
+	 * 
+	 * @param variable
+	 *            the variable name of the field to search.
+	 * @return the field whose variable matches the specified variable
+	 */
+	public FormField getField(final String variable) {
+		for (final Element el : getChildElements(element, "field")) {
+			final FormField formField = new FormField(el);
+			if (variable.equals(formField.getVariable()))
+				return formField;
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the fields that are part of the form.
+	 * 
+	 * @return fields that are part of the form.
+	 */
+	public List<FormField> getFields() {
+		final List<FormField> answer = new ArrayList<FormField>();
+		for (final Element el : getChildElements(element, "field")) {
+			answer.add(new FormField(el));
+		}
+		return answer;
 	}
 
 	/**
@@ -223,7 +245,7 @@ public class DataForm extends PacketExtension {
 	 * @return the newly created field.
 	 */
 	public FormField addField() {
-		return new FormField(element.addElement("field"));
+		return new FormField(addChildElement(element, "field"));
 	}
 
 	/**
@@ -257,50 +279,16 @@ public class DataForm extends PacketExtension {
 	}
 
 	/**
-	 * Returns the fields that are part of the form.
-	 * 
-	 * @return fields that are part of the form.
-	 */
-	@SuppressWarnings("unchecked")
-	public List<FormField> getFields() {
-		final List<FormField> answer = new ArrayList<FormField>();
-		for (final Iterator<Element> it = element.elementIterator("field"); it.hasNext();) {
-			answer.add(new FormField(it.next()));
-		}
-		return answer;
-	}
-
-	/**
-	 * Returns the field whose variable matches the specified variable.
-	 * 
-	 * @param variable
-	 *            the variable name of the field to search.
-	 * @return the field whose variable matches the specified variable
-	 */
-	@SuppressWarnings("unchecked")
-	public FormField getField(final String variable) {
-		for (final Iterator<Element> it = element.elementIterator("field"); it.hasNext();) {
-			final FormField formField = new FormField(it.next());
-			if (variable.equals(formField.getVariable()))
-				return formField;
-		}
-		return null;
-	}
-
-	/**
 	 * Removes the field whose variable matches the specified variable.
 	 * 
 	 * @param variable
 	 *            the variable name of the field to remove.
 	 * @return true if the field was removed.
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean removeField(final String variable) {
-		for (final Iterator<Element> it = element.elementIterator("field"); it.hasNext();) {
-			final Element field = it.next();
-			final String fieldVariable = field.attributeValue("var");
-			if (variable.equals(fieldVariable))
-				return element.remove(field);
+		for (final Element field : getChildElements(element, "field")) {
+			if (variable.equals(getAttribute(field, "var")))
+				return element.removeChild(field) != null;
 		}
 		return false;
 	}
@@ -319,20 +307,18 @@ public class DataForm extends PacketExtension {
 	 *            indicates the type of field of the new column. Optional
 	 *            parameter.
 	 */
-	public void addReportedField(final String variable, final String label, final FormField.Type type) {
-		Element reported = element.element("reported");
-		synchronized (element) {
-			if (reported == null) {
-				reported = element.element("reported");
-				if (reported == null) {
-					reported = element.addElement("reported");
-				}
-			}
+	public FormField addReportedField(final String variable, final String label, final FormField.Type type) {
+		Element reported = getChildElement(element, "reported");
+		if (reported == null) {
+			reported = addChildElement(element, "reported");
 		}
-		final FormField newField = new FormField(reported.addElement("field"));
+
+		final FormField newField = new FormField(addChildElement(reported, "field"));
 		newField.setVariable(variable);
 		newField.setType(type);
 		newField.setLabel(label);
+
+		return newField;
 	}
 
 	/**
@@ -349,24 +335,23 @@ public class DataForm extends PacketExtension {
 	 *            list of <variable,value> to be added as a new item.
 	 */
 	public void addItemFields(final Map<String, Object> fields) {
-		final Element item = element.addElement("item");
+		final Element item = addChildElement(element, "item");
 		// Add a field element to the item element for each row in fields
 		for (final Entry<String, Object> entry : fields.entrySet()) {
-			final Element field = item.addElement("field");
-			field.addAttribute("var", entry.getKey());
+			final Element field = addChildElement(item, "field");
+			setAttribute(field, "var", entry.getKey());
 			final Object value = entry.getValue();
 			if (value == null) {
 				continue;
-			}
-			if (value instanceof Collection) {
+			} else if (value instanceof Collection) {
 				// Add a value element for each entry in the collection
 				for (final Object colValue : (Collection<?>) value) {
 					if (colValue != null) {
-						field.addElement("value").setText(encode(colValue));
+						setChildElementText(field, "value", encode(colValue));
 					}
 				}
 			} else {
-				field.addElement("value").setText(encode(value));
+				setChildElementText(field, "value", encode(value));
 			}
 		}
 	}

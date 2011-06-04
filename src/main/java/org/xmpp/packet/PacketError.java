@@ -468,16 +468,16 @@ public class PacketError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public final static Condition fromXMPP(String condition) {
+		public final static Condition fromXMPP(final String condition) {
 			return valueOf(condition.replace("-", "_"));
 		}
 
 		public final static Condition fromLegacyCode(final int code) {
-			for (Condition condition : values()) {
+			for (final Condition condition : values()) {
 				if (condition.getLegacyCode() == code)
 					return condition;
 			}
-			
+
 			throw new IllegalArgumentException("Invalid code: " + code);
 		}
 
@@ -583,10 +583,10 @@ public class PacketError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public final static Type fromXMPP(String type) {
+		public final static Type fromXMPP(final String type) {
 			if (type != null && type.equals("continue"))
 				return continue_processing;
-			
+
 			return valueOf(type);
 		}
 
@@ -599,7 +599,7 @@ public class PacketError extends BaseXML {
 		public final String toString() {
 			if (this == continue_processing)
 				return "continue";
-			
+
 			return super.toString();
 		}
 	}

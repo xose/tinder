@@ -19,12 +19,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.Iterator;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
 
@@ -71,16 +70,15 @@ public class AbstractComponentServiceDiscovery {
 	 * This test verifies that the component has an identity that matches the
 	 * component name and is of category 'component'
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testIdentityHasNameAndCategory() throws Exception {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("identity");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("identity");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("category") != "component") {
 				continue;
 			}
@@ -97,16 +95,15 @@ public class AbstractComponentServiceDiscovery {
 	 * As the component supports XEP-0030, its service discovery response should
 	 * include the disco#info feature.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHasDiscoInfoFeature() throws Exception {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("feature");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("feature");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("var") == DISCOINFONS)
 				// succes!
 				return;
@@ -119,16 +116,15 @@ public class AbstractComponentServiceDiscovery {
 	 * As the component supports XEP-0199, its service discovery response should
 	 * include the xmpp-ping feature.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHasPingFeature() throws Exception {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("feature");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("feature");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("var") == "urn:xmpp:ping")
 				// succes!
 				return;
@@ -141,16 +137,15 @@ public class AbstractComponentServiceDiscovery {
 	 * As the component supports XEP-0012, its service discovery response should
 	 * include the last-activity feature.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHasLastActivityFeature() throws Exception {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("feature");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("feature");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("var") == "jabber:iq:last")
 				// succes!
 				return;
@@ -163,16 +158,15 @@ public class AbstractComponentServiceDiscovery {
 	 * As the component supports XEP-0202, its service discovery response should
 	 * include the entity-time feature.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testHasEntityTimeFeature() throws Exception {
 		assertNotNull(response);
 		assertTrue(response.isResponse());
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("feature");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("feature");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("var") == "urn:xmpp:time")
 				// succes!
 				return;
@@ -186,7 +180,6 @@ public class AbstractComponentServiceDiscovery {
 	 * disco info responses.
 	 */
 	@Test
-	@SuppressWarnings("unchecked")
 	public void testHasOtherNamespaces() throws Exception {
 		// setup
 		final String ns1 = "NS1";
@@ -214,9 +207,9 @@ public class AbstractComponentServiceDiscovery {
 		boolean has2 = false;
 
 		final Element childElement = response.getIQChildElement();
-		final Iterator<Element> iter = childElement.elementIterator("feature");
-		while (iter.hasNext()) {
-			final Element element = iter.next();
+		final NodeList list = childElement.getElementsByTagName("feature");
+		for (int i = 0; i < list.getLength(); i++) {
+			final Element element = (Element) list.item(i);
 			if (element.getAttribute("var") == ns1) {
 				has1 = true;
 			} else if (element.getAttribute("var") == ns2) {

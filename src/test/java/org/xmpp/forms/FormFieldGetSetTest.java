@@ -25,7 +25,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.w3c.dom.Element;
 import org.xmpp.forms.FormField.Option;
 import org.xmpp.forms.FormField.Type;
 
@@ -43,8 +42,6 @@ import org.xmpp.forms.FormField.Type;
  */
 public class FormFieldGetSetTest {
 
-	private static final DocumentFactory DF = DocumentFactory.getInstance();
-
 	/**
 	 * Every test will be using a new, empty {@link FormField} instance, which
 	 * is set and reset in this field.
@@ -54,8 +51,7 @@ public class FormFieldGetSetTest {
 	@Before
 	public void setUp() {
 		// reset the element before every test.
-		final Element emptyElement = DF.createDocument().addElement("field");
-		field = new FormField(emptyElement);
+		field = new FormField();
 	}
 
 	/**

@@ -346,7 +346,7 @@ public class StreamError extends BaseXML {
 		 *            the String value.
 		 * @return the condition corresponding to the String.
 		 */
-		public final static Condition fromXMPP(String condition) {
+		public final static Condition fromXMPP(final String condition) {
 			return valueOf(condition.replace("-", "_"));
 		}
 

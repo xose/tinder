@@ -14,7 +14,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -35,7 +34,6 @@ public abstract class BaseXML implements Cloneable {
 		}
 	}
 
-	protected final Document document;
 	protected final Element element;
 
 	/**
@@ -53,8 +51,7 @@ public abstract class BaseXML implements Cloneable {
 	 * new packets.
 	 */
 	protected BaseXML(final String qualifiedName, final String namespaceURI) {
-		document = docBuilder.newDocument();
-		element = document.createElementNS(namespaceURI, qualifiedName);
+		element = docBuilder.newDocument().createElementNS(namespaceURI, qualifiedName);
 	}
 
 	/**
@@ -67,8 +64,7 @@ public abstract class BaseXML implements Cloneable {
 	 *            the XML Element that contains the packet contents.
 	 */
 	protected BaseXML(final Element element) {
-		document = docBuilder.newDocument();
-		this.element = (Element) document.importNode(element, true);
+		this.element = element;
 	}
 
 	protected final static Iterable<Element> getChildElements(final Element element) {

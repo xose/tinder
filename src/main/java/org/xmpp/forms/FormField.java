@@ -17,12 +17,13 @@
 package org.xmpp.forms;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.concurrent.NotThreadSafe;
 
 import org.w3c.dom.Element;
+import org.xmpp.util.BaseXML;
 
 /**
  * Represents a field of a form. The field could be used to represent a question
@@ -32,75 +33,43 @@ import org.w3c.dom.Element;
  * @author Gaston Dombiak
  */
 @NotThreadSafe
-public class FormField {
+public class FormField extends BaseXML {
 
-	private final Element element;
+	protected FormField() {
+		super("field");
+	}
 
-	private FormField(final Element element) {
-		this.element = element;
+	protected FormField(final Element element) {
+		super(element);
 	}
 
 	/**
-	 * Adds a default value to the question if the question is part of a form to
-	 * fill out. Otherwise, adds an answered value to the question.
-	 * <p>
-	 * Nothing will be added if the provided argument is <tt>null</tt>.
+	 * Returns an indicative of the format for the data to answer. Valid formats
+	 * are:
+	 * <p/>
+	 * <ul>
+	 * <li>text-single -> single line or word of text
+	 * <li>text-private -> instead of showing the user what they typed, you show
+	 * ***** to protect it
+	 * <li>text-multi -> multiple lines of text entry
+	 * <li>list-single -> given a list of choices, pick one
+	 * <li>list-multi -> given a list of choices, pick one or more
+	 * <li>boolean -> 0 or 1, true or false, yes or no. Default value is 0
+	 * <li>fixed -> fixed for putting in text to show sections, or just
+	 * advertise your web site in the middle of the form
+	 * <li>hidden -> is not given to the user at all, but returned with the
+	 * questionnaire
+	 * <li>jid-single -> Jabber ID - choosing a JID from your roster, and
+	 * entering one based on the rules for a JID.
+	 * <li>jid-multi -> multiple entries for JIDs
+	 * </ul>
 	 * 
-	 * @param value
-	 *            a default value or an answered value of the question.
+	 * @return format for the data to answer.
 	 */
-	public void addValue(final Object value) {
-		if (value == null)
-			return;
-		element.addElement("value").setText(DataForm.encode(value));
-	}
+	public Type getType() {
+		final String type = getAttribute(element, "type");
 
-	/**
-	 * Removes all the values of the field.
-	 */
-	@SuppressWarnings("unchecked")
-	public void clearValues() {
-		for (final Iterator<Element> it = element.elementIterator("value"); it.hasNext();) {
-			it.next();
-			it.remove();
-		}
-	}
-
-	/**
-	 * Adds an available option to the question that the user has in order to
-	 * answer the question.
-	 * <p>
-	 * If argument 'value' is <tt>null</tt> or an empty String, no option
-	 * element will be added.
-	 * 
-	 * @param label
-	 *            a label that represents the option. Optional argument.
-	 * @param value
-	 *            the value of the option.
-	 */
-	public void addOption(final String label, final String value) {
-		if (value == null || value.trim().length() == 0)
-			return;
-
-		final Element option = element.addElement("option");
-		option.addAttribute("label", label);
-		option.addElement("value").setText(value);
-	}
-
-	/**
-	 * Returns the available options to answer for this question. The returned
-	 * options cannot be modified but they will be updated if the underlying DOM
-	 * object gets updated.
-	 * 
-	 * @return the available options to answer for this question.
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Option> getOptions() {
-		final List<Option> answer = new ArrayList<Option>();
-		for (final Iterator<Element> it = element.elementIterator("option"); it.hasNext();) {
-			answer.add(new Option(it.next()));
-		}
-		return answer;
+		return type != null ? Type.fromXMPP(type) : null;
 	}
 
 	/**
@@ -128,7 +97,16 @@ public class FormField {
 	 *            an indicative of the format for the data to answer.
 	 */
 	public void setType(final Type type) {
-		element.addAttribute("type", type == null ? null : type.toString());
+		setAttribute(element, "type", type != null ? type.toString() : null);
+	}
+
+	/**
+	 * Returns the variable name that the question is filling out.
+	 * 
+	 * @return the variable name of the question.
+	 */
+	public String getVariable() {
+		return getAttribute(element, "var");
 	}
 
 	/**
@@ -139,7 +117,17 @@ public class FormField {
 	 *            the unique identifier of the field in the context of the form.
 	 */
 	public void setVariable(final String var) {
-		element.addAttribute("var", var);
+		setAttribute(element, "var", var);
+	}
+
+	/**
+	 * Returns the label of the question which should give enough information to
+	 * the user to fill out the form.
+	 * 
+	 * @return label of the question.
+	 */
+	public String getLabel() {
+		return getAttribute(element, "label");
 	}
 
 	/**
@@ -150,25 +138,22 @@ public class FormField {
 	 *            the label of the question.
 	 */
 	public void setLabel(final String label) {
-		element.addAttribute("label", label);
+		setAttribute(element, "label", label);
 	}
 
 	/**
-	 * Sets if the question must be answered in order to complete the
-	 * questionnaire.
+	 * Returns a description that provides extra clarification about the
+	 * question. This information could be presented to the user either in
+	 * tool-tip, help button, or as a section of text before the question.
+	 * <p>
+	 * <p/>
+	 * If the question is of type FIXED then the description should remain
+	 * empty.
 	 * 
-	 * @param required
-	 *            if the question must be answered in order to complete the
-	 *            questionnaire.
+	 * @return description that provides extra clarification about the question.
 	 */
-	public void setRequired(final boolean required) {
-		// Remove an existing desc element.
-		if (element.element("required") != null) {
-			element.remove(element.element("required"));
-		}
-		if (required) {
-			element.addElement("required");
-		}
+	public String getDescription() {
+		return getChildElementText(element, "desc");
 	}
 
 	/**
@@ -187,15 +172,7 @@ public class FormField {
 	 *            provides extra clarification about the question.
 	 */
 	public void setDescription(final String description) {
-		// Remove an existing desc element.
-		if (element.element("desc") != null) {
-			element.remove(element.element("desc"));
-		}
-
-		if (description == null || description.trim().length() == 0)
-			return;
-
-		element.addElement("desc").setText(description);
+		setChildElementText(element, "desc", description);
 	}
 
 	/**
@@ -206,16 +183,24 @@ public class FormField {
 	 *         questionnaire.
 	 */
 	public boolean isRequired() {
-		return element.element("required") != null;
+		return getChildElement(element, "required") != null;
 	}
 
 	/**
-	 * Returns the variable name that the question is filling out.
+	 * Sets if the question must be answered in order to complete the
+	 * questionnaire.
 	 * 
-	 * @return the variable name of the question.
+	 * @param required
+	 *            if the question must be answered in order to complete the
+	 *            questionnaire.
 	 */
-	public String getVariable() {
-		return element.attributeValue("var");
+	public void setRequired(final boolean required) {
+		// Remove an existing desc element.
+		if (!required && isRequired()) {
+			element.removeChild(getChildElement(element, "required"));
+		} else if (required && !isRequired()) {
+			addChildElement(element, "required");
+		}
 	}
 
 	/**
@@ -226,12 +211,13 @@ public class FormField {
 	 * @return an Iterator for the default values or answered values of the
 	 *         question.
 	 */
-	@SuppressWarnings("unchecked")
 	public List<String> getValues() {
 		final List<String> answer = new ArrayList<String>();
-		for (final Iterator<Element> it = element.elementIterator("value"); it.hasNext();) {
-			answer.add(it.next().getTextTrim());
+
+		for (final Element el : getChildElements(element, "value")) {
+			answer.add(el.getTextContent().trim());
 		}
+
 		return answer;
 	}
 
@@ -243,77 +229,71 @@ public class FormField {
 	 *            The field from which to return the first value.
 	 * @return String based value, or 'null' if the FormField has no values.
 	 */
-	@SuppressWarnings("unchecked")
 	public String getFirstValue() {
-		for (final Iterator<Element> it = element.elementIterator("value"); it.hasNext();)
-			return it.next().getTextTrim();
-
-		return null;
+		return getChildElement(element, "value").getTextContent();
 	}
 
 	/**
-	 * Returns an indicative of the format for the data to answer. Valid formats
-	 * are:
-	 * <p/>
-	 * <ul>
-	 * <li>text-single -> single line or word of text
-	 * <li>text-private -> instead of showing the user what they typed, you show
-	 * ***** to protect it
-	 * <li>text-multi -> multiple lines of text entry
-	 * <li>list-single -> given a list of choices, pick one
-	 * <li>list-multi -> given a list of choices, pick one or more
-	 * <li>boolean -> 0 or 1, true or false, yes or no. Default value is 0
-	 * <li>fixed -> fixed for putting in text to show sections, or just
-	 * advertise your web site in the middle of the form
-	 * <li>hidden -> is not given to the user at all, but returned with the
-	 * questionnaire
-	 * <li>jid-single -> Jabber ID - choosing a JID from your roster, and
-	 * entering one based on the rules for a JID.
-	 * <li>jid-multi -> multiple entries for JIDs
-	 * </ul>
-	 * 
-	 * @return format for the data to answer.
-	 */
-	public Type getType() {
-		final String type = element.attributeValue("type");
-		if (type != null)
-			return Type.fromXMPP(type);
-		return null;
-	}
-
-	/**
-	 * Returns the label of the question which should give enough information to
-	 * the user to fill out the form.
-	 * 
-	 * @return label of the question.
-	 */
-	public String getLabel() {
-		return element.attributeValue("label");
-	}
-
-	/**
-	 * Returns a description that provides extra clarification about the
-	 * question. This information could be presented to the user either in
-	 * tool-tip, help button, or as a section of text before the question.
+	 * Adds a default value to the question if the question is part of a form to
+	 * fill out. Otherwise, adds an answered value to the question.
 	 * <p>
-	 * <p/>
-	 * If the question is of type FIXED then the description should remain
-	 * empty.
+	 * Nothing will be added if the provided argument is <tt>null</tt>.
 	 * 
-	 * @return description that provides extra clarification about the question.
+	 * @param value
+	 *            a default value or an answered value of the question.
 	 */
-	public String getDescription() {
-		return element.elementTextTrim("desc");
+	public void addValue(final Object value) {
+		if (value == null)
+			return;
+
+		addChildElement(element, "value").setTextContent(DataForm.encode(value));
 	}
 
 	/**
-	 * Creates and returns a new object that is an exact copy of this FormField
-	 * object.
-	 * 
-	 * @return an exact copy of this instance.
+	 * Removes all the values of the field.
 	 */
-	public FormField createCopy() {
-		return new FormField(element.createCopy());
+	public void clearValues() {
+		for (final Element el : getChildElements(element, "value")) {
+			element.removeChild(el);
+		}
+	}
+
+	/**
+	 * Returns the available options to answer for this question. The returned
+	 * options cannot be modified but they will be updated if the underlying DOM
+	 * object gets updated.
+	 * 
+	 * @return the available options to answer for this question.
+	 */
+	public List<Option> getOptions() {
+		final List<Option> answer = new ArrayList<Option>();
+
+		for (final Element el : getChildElements(element, "option")) {
+			answer.add(new Option(getAttribute(el, "label"), getAttribute(el, "value")));
+		}
+
+		return Collections.unmodifiableList(answer);
+	}
+
+	/**
+	 * Adds an available option to the question that the user has in order to
+	 * answer the question.
+	 * <p>
+	 * If argument 'value' is <tt>null</tt> or an empty String, no option
+	 * element will be added.
+	 * 
+	 * @param label
+	 *            a label that represents the option. Optional argument.
+	 * @param value
+	 *            the value of the option.
+	 */
+	public void addOption(final String label, final String value) {
+		if (value == null || value.trim().length() == 0)
+			return;
+
+		final Element option = addChildElement(element, "option");
+		setAttribute(option, "label", label);
+		setChildElementText(option, "value", value);
 	}
 
 	/**
@@ -321,11 +301,14 @@ public class FormField {
 	 * 
 	 * @author Gaston Dombiak
 	 */
-	public static class Option {
-		private final Element element;
+	public static final class Option {
 
-		private Option(final Element element) {
-			this.element = element;
+		private final String label;
+		private final String value;
+
+		private Option(final String label, final String value) {
+			this.label = label;
+			this.value = value;
 		}
 
 		/**
@@ -333,8 +316,8 @@ public class FormField {
 		 * 
 		 * @return the label that represents the option.
 		 */
-		public String getLabel() {
-			return element.attributeValue("label");
+		public final String getLabel() {
+			return label;
 		}
 
 		/**
@@ -342,8 +325,8 @@ public class FormField {
 		 * 
 		 * @return the value of the option.
 		 */
-		public String getValue() {
-			return element.elementTextTrim("value");
+		public final String getValue() {
+			return value;
 		}
 	}
 
@@ -430,10 +413,10 @@ public class FormField {
 		 *            the String value.
 		 * @return the type corresponding to the String.
 		 */
-		public final static Type fromXMPP(String type) {
+		public final static Type fromXMPP(final String type) {
 			if (type != null && type.equals("boolean"))
 				return boolean_type;
-			
+
 			return valueOf(type);
 		}
 
@@ -446,7 +429,7 @@ public class FormField {
 		public final String toString() {
 			if (this == boolean_type)
 				return "boolean";
-			
+
 			return super.toString();
 		}
 	}
