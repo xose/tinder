@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xmpp.packet.IQ;
 import org.xmpp.packet.IQ.Type;
@@ -602,18 +603,26 @@ public abstract class AbstractComponent implements Component {
 	protected IQ handleDiscoInfo(final IQ iq) {
 		final IQ replyPacket = IQ.createResultIQ(iq);
 		final Element responseElement = replyPacket.setIQChildElement("query", NAMESPACE_DISCO_INFO);
+		final Document doc = responseElement.getOwnerDocument();
 
+		// TODO: create a new packet type
 		// identity
-		responseElement.addElement("identity").addAttribute("category", discoInfoIdentityCategory()).addAttribute("type", discoInfoIdentityCategoryType())
-				.addAttribute("name", getName());
+		final Element identityElement = doc.createElement("identity");
+		identityElement.setAttribute("category", discoInfoIdentityCategory());
+		identityElement.setAttribute("type", discoInfoIdentityCategoryType());
+		identityElement.setAttribute("name", getName());
+		responseElement.appendChild(identityElement);
+
 		// features
-		responseElement.addElement("feature").addAttribute("var", NAMESPACE_DISCO_INFO);
-		responseElement.addElement("feature").addAttribute("var", NAMESPACE_XMPP_PING);
-		responseElement.addElement("feature").addAttribute("var", NAMESPACE_LAST_ACTIVITY);
-		responseElement.addElement("feature").addAttribute("var", NAMESPACE_ENTITY_TIME);
+		((Element) responseElement.appendChild(doc.createElement("feature"))).setAttribute("var", NAMESPACE_DISCO_INFO);
+		((Element) responseElement.appendChild(doc.createElement("feature"))).setAttribute("var", NAMESPACE_XMPP_PING);
+		((Element) responseElement.appendChild(doc.createElement("feature"))).setAttribute("var", NAMESPACE_LAST_ACTIVITY);
+		((Element) responseElement.appendChild(doc.createElement("feature"))).setAttribute("var", NAMESPACE_ENTITY_TIME);
+
 		for (final String feature : discoInfoFeatureNamespaces()) {
-			responseElement.addElement("feature").addAttribute("var", feature);
+			((Element) responseElement.appendChild(doc.createElement("feature"))).setAttribute("var", feature);
 		}
+
 		return replyPacket;
 	}
 
@@ -666,8 +675,11 @@ public abstract class AbstractComponent implements Component {
 
 		final IQ result = IQ.createResultIQ(iq);
 		final Element el = result.setIQChildElement("time", NAMESPACE_ENTITY_TIME);
-		el.addElement("tzo").setText(tzo);
-		el.addElement("utc").setText(utc);
+		final Document doc = el.getOwnerDocument();
+
+		((Element) el.appendChild(doc.createElement("tzo"))).setTextContent(tzo);
+		((Element) el.appendChild(doc.createElement("utc"))).setTextContent(utc);
+
 		return result;
 	}
 

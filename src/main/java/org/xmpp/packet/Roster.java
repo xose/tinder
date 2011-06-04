@@ -328,6 +328,11 @@ public class Roster extends IQ {
 		}
 	}
 
+	@Override
+	public Roster clone() {
+		return new Roster(element);
+	}
+
 	/**
 	 * Type-safe enumeration for the roster subscription type. Valid subcription
 	 * types:

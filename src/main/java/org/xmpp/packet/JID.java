@@ -57,7 +57,7 @@ import com.googlecode.concurrentlinkedhashmap.ConcurrentLinkedHashMap.Builder;
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
  */
 @Immutable
-public class JID implements Comparable<JID>, Serializable {
+public class JID implements Comparable<JID>, Cloneable, Serializable {
 
 	private static final long serialVersionUID = 8135170608402192877L;
 
@@ -787,6 +787,11 @@ public class JID implements Comparable<JID>, Serializable {
 		}
 
 		return sb.toString();
+	}
+
+	@Override
+	public JID clone() {
+		return new JID(getNode(), getDomain(), getResource());
 	}
 
 	/**

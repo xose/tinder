@@ -107,7 +107,7 @@ public class PacketExtension extends BaseXML {
 	 *            Packet's element.
 	 */
 	public static final void addExtension(final Element element, final PacketExtension extension) {
-		element.appendChild(extension.getElement());
+		element.appendChild(element.getOwnerDocument().importNode(extension.getElement(), true));
 	}
 
 	/**
@@ -166,6 +166,11 @@ public class PacketExtension extends BaseXML {
 			return false;
 
 		return element.removeChild(extension) != null;
+	}
+
+	@Override
+	public PacketExtension clone() {
+		return new PacketExtension(element);
 	}
 
 }

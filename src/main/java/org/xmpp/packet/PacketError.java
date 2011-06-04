@@ -243,7 +243,7 @@ public class PacketError extends BaseXML {
 		// Delete current condition.
 		for (final Element el : getChildElements(element)) {
 			if (!ERROR_NAMESPACE.equals(el.getNamespaceURI())) {
-				element.removeChild(element);
+				element.removeChild(el);
 			}
 		}
 
@@ -283,6 +283,11 @@ public class PacketError extends BaseXML {
 				return el.getNamespaceURI();
 		}
 		return null;
+	}
+
+	@Override
+	public PacketError clone() {
+		return new PacketError(element);
 	}
 
 	/**

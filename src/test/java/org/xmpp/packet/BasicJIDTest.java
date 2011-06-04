@@ -16,7 +16,10 @@
 package org.xmpp.packet;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -123,5 +126,26 @@ public class BasicJIDTest {
 		assertNull(jid.getNode());
 		assertEquals("domain", jid.getDomain());
 		assertNull(jid.getResource());
+	}
+
+	@Test
+	public void testEqualsHashCode() {
+		final JID j1 = new JID("node@domain/resource");
+		final JID j2 = new JID("node@domain/resource");
+		final JID j3 = new JID("edon@niamod/ecrouser");
+
+		assertNotSame(j1, j2);
+		assertNotSame(j1, j3);
+		assertNotSame(j2, j3);
+
+		assertTrue(j1.equals(j2));
+		assertTrue(j2.equals(j1));
+		assertFalse(j1.equals(j3));
+		assertFalse(j3.equals(j1));
+		assertFalse(j2.equals(j3));
+		assertFalse(j3.equals(j2));
+
+		assertTrue(j1.hashCode() == j2.hashCode());
+		assertFalse(j1.hashCode() == j3.hashCode());
 	}
 }

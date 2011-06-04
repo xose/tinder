@@ -344,6 +344,11 @@ public class IQ extends Packet {
 		return result;
 	}
 
+	@Override
+	public IQ clone() {
+		return new IQ(element);
+	}
+
 	/**
 	 * Type-safe enumeration to represent the type of the IQ packet. The types
 	 * are:
@@ -389,4 +394,5 @@ public class IQ extends Packet {
 		error;
 
 	}
+
 }

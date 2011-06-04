@@ -39,7 +39,7 @@ import org.xmpp.util.BaseXML;
  * @author Matt Tucker
  */
 @NotThreadSafe
-public class Packet extends BaseXML {
+public abstract class Packet extends BaseXML {
 
 	protected Packet(final String elementName) {
 		super(elementName);
@@ -206,7 +206,7 @@ public class Packet extends BaseXML {
 			element.removeChild(getError().getElement());
 		}
 		// Add the error element.
-		element.appendChild(error.getElement());
+		element.appendChild(element.getOwnerDocument().importNode(error.getElement(), true));
 	}
 
 	/**
@@ -224,8 +224,6 @@ public class Packet extends BaseXML {
 	}
 
 	@Override
-	public Packet clone() {
-		return new Packet(element);
-	}
+	public abstract Packet clone();
 
 }

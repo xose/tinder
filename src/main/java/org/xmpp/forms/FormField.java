@@ -269,7 +269,7 @@ public class FormField extends BaseXML {
 		final List<Option> answer = new ArrayList<Option>();
 
 		for (final Element el : getChildElements(element, "option")) {
-			answer.add(new Option(getAttribute(el, "label"), getAttribute(el, "value")));
+			answer.add(new Option(getAttribute(el, "label"), getChildElementText(el, "value")));
 		}
 
 		return Collections.unmodifiableList(answer);
@@ -294,6 +294,11 @@ public class FormField extends BaseXML {
 		final Element option = addChildElement(element, "option");
 		setAttribute(option, "label", label);
 		setChildElementText(option, "value", value);
+	}
+
+	@Override
+	public FormField clone() {
+		return new FormField(element);
 	}
 
 	/**

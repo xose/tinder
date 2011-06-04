@@ -20,6 +20,7 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.w3c.dom.Element;
 
 /**
  * Tests that verify the behaviour of 'to' and 'from' related functionality of
@@ -28,6 +29,23 @@ import org.junit.Test;
  * @author Guus der Kinderen, guus.der.kinderen@gmail.com
  */
 public class PacketAddressingTest {
+
+	private class DummyPacket extends Packet {
+
+		protected DummyPacket(final String elementName) {
+			super(elementName);
+		}
+
+		public DummyPacket(final Element element) {
+			super(element);
+		}
+
+		@Override
+		public DummyPacket clone() {
+			return new DummyPacket(element);
+		}
+
+	}
 
 	/**
 	 * Packet instance to be used by individual test methods.
@@ -39,7 +57,7 @@ public class PacketAddressingTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		packet = new Packet("packet");
+		packet = new DummyPacket("packet");
 	}
 
 	/**
@@ -49,7 +67,6 @@ public class PacketAddressingTest {
 	public void testAllowNullToJID() throws Exception {
 		packet.setTo(null);
 		assertNull(packet.getTo());
-		assertNull(packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -100,7 +117,6 @@ public class PacketAddressingTest {
 
 		// verify
 		assertNull(packet.getTo());
-		assertNull(packet.getElement().getAttribute("to"));
 	}
 
 	/**
@@ -110,7 +126,6 @@ public class PacketAddressingTest {
 	public void testAllowNullFromJID() throws Exception {
 		packet.setFrom((JID) null);
 		assertNull(packet.getFrom());
-		assertNull(packet.getElement().getAttribute("from"));
 	}
 
 	/**
@@ -161,6 +176,5 @@ public class PacketAddressingTest {
 
 		// verify
 		assertNull(packet.getFrom());
-		assertNull(packet.getElement().getAttribute("from"));
 	}
 }

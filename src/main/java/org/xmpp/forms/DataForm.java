@@ -356,6 +356,11 @@ public class DataForm extends PacketExtension {
 		}
 	}
 
+	@Override
+	public DataForm clone() {
+		return new DataForm(element);
+	}
+
 	/**
 	 * Type-safe enumeration to represent the type of the Data forms.
 	 */

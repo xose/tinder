@@ -163,6 +163,11 @@ public class StreamError extends BaseXML {
 		return getChildElementLang(element, "text");
 	}
 
+	@Override
+	public StreamError clone() {
+		return new StreamError(element);
+	}
+
 	/**
 	 * Type-safe enumeration for the error condition.
 	 * <p>

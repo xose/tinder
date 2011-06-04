@@ -180,6 +180,11 @@ public class Presence extends Packet {
 		setChildElementText(element, "priority", Integer.toString(priority));
 	}
 
+	@Override
+	public Presence clone() {
+		return new Presence(element);
+	}
+
 	/**
 	 * Represents the type of a presence packet. Note: the presence is assumed
 	 * to be "available" when the type attribute of the packet is <tt>null</tt>.

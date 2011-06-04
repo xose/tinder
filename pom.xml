@@ -107,12 +107,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>junit-addons</groupId>
-			<artifactId>junit-addons</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.6.1</version>

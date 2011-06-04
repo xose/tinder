@@ -239,7 +239,7 @@ public abstract class BaseXML implements Cloneable {
 	protected final static String getChildElementLang(final Element element, final String qualifiedName, final String namespaceURI) {
 		final Element childElement = getChildElement(element, qualifiedName, namespaceURI);
 
-		return getAttribute(childElement, "xml:lang", XMLConstants.XML_NS_URI);
+		return childElement != null ? getAttribute(childElement, "xml:lang", XMLConstants.XML_NS_URI) : null;
 	}
 
 	protected final static void setChildElementLang(final Element element, final String name, final String language) {
@@ -249,7 +249,9 @@ public abstract class BaseXML implements Cloneable {
 	protected final static void setChildElementLang(final Element element, final String qualifiedName, final String namespaceURI, final String language) {
 		final Element childElement = getChildElement(element, qualifiedName, namespaceURI);
 
-		setAttribute(childElement, "xml:lang", XMLConstants.XML_NS_URI, language);
+		if (childElement != null) {
+			setAttribute(childElement, "xml:lang", XMLConstants.XML_NS_URI, language);
+		}
 	}
 
 	protected final static String getAttribute(final Element element, final String name) {
@@ -284,6 +286,9 @@ public abstract class BaseXML implements Cloneable {
 	public final Element getElement() {
 		return element;
 	}
+
+	@Override
+	public abstract BaseXML clone();
 
 	@Override
 	public final String toString() {

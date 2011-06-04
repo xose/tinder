@@ -181,6 +181,11 @@ public class Message extends Packet {
 		setChildElementText(element, "thread", thread);
 	}
 
+	@Override
+	public Message clone() {
+		return new Message(element);
+	}
+
 	/**
 	 * Type-safe enumeration for the type of a message. The types are:
 	 * 
